@@ -7,7 +7,7 @@
     "require": {
         "php": ">=5.3.0",
         "stubbles/core": "~3.1",
-        "stubbles/console": "~2.3",
+        "stubbles/console": "~2.4",
         "herrera-io/version": "~1.0"
     },
     "require-dev": {

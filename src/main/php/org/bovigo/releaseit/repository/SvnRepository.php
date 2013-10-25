@@ -53,7 +53,7 @@ class SvnRepository implements Repository
         }
 
         if (null === $this->svnTagsUrl) {
-            throw new RepositoryError('Could not retrieve svn tag url, can\'t create release for this svn repository');
+            throw new RepositoryError('Could not retrieve svn tag url, can not create release for this svn repository');
         }
     }
 
@@ -74,18 +74,21 @@ class SvnRepository implements Repository
              return strstr($svnUrl, '/branches/', true) . '/tags';
          }
 
-         throw new RepositoryError('Can\'t extract tag url from current svn checkout url ' . $svnUrl);
+         throw new RepositoryError('Can not extract tag url from current svn checkout url ' . $svnUrl);
     }
 
     /**
      * checks whether repository is dirty and therefore can't be released
+     *
+     * A SVN checkout is considered dirty when there's more than one line output
+     * from svn status.
      *
      * @return  bool
      * @throws  RepositoryError
      */
     public function isDirty()
     {
-        return count($this->execute('svn status 2>&1 | tail -n1', 'Failure while checking svn status') === 0);
+        return (count($this->execute('svn status 2>&1 | tail -n1', 'Failure while checking svn status')) !== 0);
     }
 
     /**

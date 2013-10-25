@@ -46,7 +46,7 @@ class GitRepository implements Repository
             throw new RepositoryError('Current directory is not a git repository');
         }
 
-        return strstr($output[0], 'nothing to commit') !== false && strstr($output[0], 'working directory clean') !== false;
+        return strstr($output[0], 'nothing to commit') === false || strstr($output[0], 'working directory clean') === false;
     }
 
     /**

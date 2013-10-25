@@ -86,8 +86,9 @@ class ReleaseIt extends ConsoleApp
             return 22;
         }
 
-        $this->echoLastReleases($repository)
-             ->createRelease($this->askVersion());
+        $version = $this->echoLastReleases($repository)->askVersion();
+        $this->console->writeLines($this->createRelease($version))
+                      ->writeLine('Successfully created release ' . $version);
         return 0;
     }
 
@@ -131,7 +132,7 @@ class ReleaseIt extends ConsoleApp
      * echos last releases for given repository
      *
      * @param   Repository  $repository
-     * @return  Repository
+     * @return  ReleaseIt
      */
     private function echoLastReleases(Repository $repository)
     {
@@ -141,13 +142,13 @@ class ReleaseIt extends ConsoleApp
         }
 
         $this->console->writeLine('');
-        return $repository;
+        return $this;
     }
 
     /**
      * asks for the new version
      *
-     * @return  string
+     * @return  version\Version
      */
     private function askVersion()
     {
