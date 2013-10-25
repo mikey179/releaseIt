@@ -14,7 +14,7 @@ use net\stubbles\lang\exception\IllegalArgumentException;
 /**
  * Filters user input to be a real version number.
  */
-class VersionNumberFilter implements Filter
+class VersionFilter implements Filter
 {
     /**
      * apply filter on given param

@@ -12,7 +12,7 @@ use net\stubbles\console\Console;
 use net\stubbles\console\ConsoleApp;
 use org\bovigo\releaseit\repository\Repository;
 use org\bovigo\releaseit\repository\RepositoryDetector;
-use org\bovigo\releaseit\version\VersionNumberFilter;
+use org\bovigo\releaseit\version\VersionFilter;
 /**
  * Console app to create composer package releases directly from within a checkout.
  *
@@ -153,9 +153,9 @@ class ReleaseIt extends ConsoleApp
     private function askVersion()
     {
         $version = null;
-        $filter  = new VersionNumberFilter();
+        $filter  = new VersionFilter();
         while (null === $version) {
-            $version = $this->console->prompt('Please name the version to release (leave empty to abort): ')
+            $version = $this->console->prompt('Please name the version to release (press Ctrl-C to abort): ')
                                      ->applyFilter($filter);
             if (null === $version) {
                 $this->console->writeLine('Not a valid version number.');
