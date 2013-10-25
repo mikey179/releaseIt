@@ -129,6 +129,7 @@ class GitRepositoryTestCase extends \PHPUnit_Framework_TestCase
     {
         $this->mockExecutor->expects($this->once())
                            ->method('executeDirect')
+                           ->with($this->equalTo('git tag -l | grep "v" | sort -r | head -5'))
                            ->will($this->throwException(new RuntimeException('error')));
         $this->gitRepository->getLastReleases();
     }
@@ -140,9 +141,10 @@ class GitRepositoryTestCase extends \PHPUnit_Framework_TestCase
     {
         $this->mockExecutor->expects($this->once())
                            ->method('executeDirect')
+                           ->with($this->equalTo('git tag -l | grep "v1.0" | sort -r | head -2'))
                            ->will(($this->returnValue(array('v1.0.0', 'v1.0.1'))));
         $this->assertEquals(array('v1.0.0', 'v1.0.1'),
-                            $this->gitRepository->getLastReleases()
+                            $this->gitRepository->getLastReleases('v1.0', 2)
         );
     }
 

@@ -31,9 +31,11 @@ interface Repository
     /**
      * returns a list of the last releases
      *
+     * @param   string  $series  limit releases to those of a certain series, i.e. v2 or v2.1, defaults to all
+     * @param   int     $amount  limit amount of releases to retrieve, defaults to 5
      * @return  string[]
      */
-    public function getLastReleases();
+    public function getLastReleases($series = 'v', $amount = 5);
 
     /**
      * creates a release with given version number
