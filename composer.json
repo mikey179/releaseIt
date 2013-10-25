@@ -19,6 +19,7 @@
             "org\\bovigo\\releaseit": "src/main/php"
         }
     },
+    "bin": ["bin/releaseIt"],
     "extra": {
         "branch-alias": {
             "dev-master": "1.0.x-dev"
