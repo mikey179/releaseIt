@@ -57,6 +57,14 @@ class ReleaseItTestCase extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
+    public function annotationsPresentOnClass()
+    {
+        $this->assertTrue(lang\reflect($this->releaseIt)->hasAnnotation('AppDescription'));
+    }
+
+    /**
+     * @test
+     */
     public function annotationsPresentOnConstructor()
     {
         $this->assertTrue(lang\reflectConstructor($this->releaseIt)->hasAnnotation('Inject'));
