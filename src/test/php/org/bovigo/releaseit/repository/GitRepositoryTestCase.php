@@ -9,7 +9,7 @@
  */
 namespace org\bovigo\releaseit\repository;
 use net\stubbles\lang\exception\RuntimeException;
-use org\bovigo\releaseit\version\Version;
+use org\bovigo\releaseit\Version;
 use org\bovigo\vfs\vfsStream;
 /**
  * Test for org\bovigo\releaseit\repository\GitRepository.
