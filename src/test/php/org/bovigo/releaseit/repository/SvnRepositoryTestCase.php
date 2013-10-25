@@ -186,6 +186,7 @@ class SvnRepositoryTestCase extends \PHPUnit_Framework_TestCase
     {
         $this->mockExecutor->expects($this->once())
                            ->method('executeDirect')
+                           ->with($this->equalTo('svn list http://svn.example.org/svn/foo/tags | grep "v" | sort -r | head -5'))
                            ->will(($this->returnValue(array('v1.0.0', 'v1.0.1'))));
         $this->assertEquals(array('v1.0.0', 'v1.0.1'),
                             $this->svnRepository->getLastReleases()
@@ -213,6 +214,7 @@ class SvnRepositoryTestCase extends \PHPUnit_Framework_TestCase
         $svnCpOutput = array('Committed revision 303.');
         $this->mockExecutor->expects($this->once())
                            ->method('executeDirect')
+                           ->with($this->equalTo('svn cp . http://svn.example.org/svn/foo/tags/v1.1.0 -m "tag release v1.1.0"'))
                            ->will(($this->returnValue($svnCpOutput)));
         $this->assertEquals($svnCpOutput,
                             $this->svnRepository->createRelease(new Version('1.1.0'))
