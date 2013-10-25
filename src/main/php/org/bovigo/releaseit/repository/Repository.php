@@ -1,0 +1,45 @@
+<?php
+/**
+ * This file is part of ReleaseIt.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * @package  org\bovigo\releaseit
+ */
+namespace org\bovigo\releaseit\repository;
+use org\bovigo\releaseit\version\Version;
+/**
+ * Provides access to a repository.
+ */
+interface Repository
+{
+    /**
+     * checks whether repository is dirty and therefore can't be released
+     *
+     * @return  bool
+     */
+    public function isDirty();
+
+    /**
+     * provides an input stream to read the current repository status
+     *
+     * @return  InputStream
+     */
+    public function readStatus();
+
+    /**
+     * returns a list of the last releases
+     *
+     * @return  string[]
+     */
+    public function getLastReleases();
+
+    /**
+     * creates a release with given version number
+     *
+     * @param   Version  $version
+     * @return  string[]
+     */
+    public function createRelease(Version $version);
+}

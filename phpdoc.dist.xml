@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<phpdoc>
+  <title>ReleaseIt API Doc</title>
+  <parser>
+    <target>docs/api</target>
+    <default-package-name>org\bovigo\releaseit</default-package-name>
+  </parser>
+  <transformer>
+    <target>docs/api</target>
+  </transformer>
+  <transformations>
+    <template name="responsive"/>
+  </transformations>
+  <files>
+    <directory>src/main/php</directory>
+  </files>
+</phpdoc>
