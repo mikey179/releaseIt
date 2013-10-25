@@ -10,7 +10,7 @@
 namespace org\bovigo\releaseit\repository;
 use net\stubbles\console\Executor;
 use net\stubbles\lang\exception\RuntimeException;
-use org\bovigo\releaseit\version\Version;
+use org\bovigo\releaseit\Version;
 /**
  * Provides access to a svn repository.
  */

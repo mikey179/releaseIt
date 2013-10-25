@@ -7,7 +7,7 @@
  *
  * @package  org\bovigo\releaseit
  */
-namespace org\bovigo\releaseit\version;
+namespace org\bovigo\releaseit;
 use net\stubbles\lang\exception\IllegalArgumentException;
 /**
  * Represents a version number.

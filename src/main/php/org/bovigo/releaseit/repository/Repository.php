@@ -8,7 +8,7 @@
  * @package  org\bovigo\releaseit
  */
 namespace org\bovigo\releaseit\repository;
-use org\bovigo\releaseit\version\Version;
+use org\bovigo\releaseit\Version;
 /**
  * Provides access to a repository.
  */

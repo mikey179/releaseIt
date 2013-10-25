@@ -10,9 +10,9 @@
 namespace org\bovigo\releaseit;
 use net\stubbles\console\Console;
 use net\stubbles\console\ConsoleApp;
+use net\stubbles\lang\exception\IllegalArgumentException;
 use org\bovigo\releaseit\repository\Repository;
 use org\bovigo\releaseit\repository\RepositoryDetector;
-use org\bovigo\releaseit\version\VersionFilter;
 /**
  * Console app to create composer package releases directly from within a checkout.
  *
@@ -148,20 +148,18 @@ class ReleaseIt extends ConsoleApp
     /**
      * asks for the new version
      *
-     * @return  version\Version
+     * @return  Version
      */
     private function askVersion()
     {
-        $version = null;
-        $filter  = new VersionFilter();
-        while (null === $version) {
-            $version = $this->console->prompt('Please name the version to release (press Ctrl-C to abort): ')
-                                     ->applyFilter($filter);
-            if (null === $version) {
-                $this->console->writeLine('Not a valid version number.');
+        while (true) {
+            try {
+                return new Version($this->console->prompt('Please name the version to release (press Ctrl-C to abort): ')
+                                                 ->unsecure()
+                );
+            } catch (IllegalArgumentException $e) {
+                $this->console->writeLine($e->getMessage());
             }
         }
-
-        return $version;
     }
 }
