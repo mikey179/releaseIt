@@ -87,7 +87,7 @@ class ReleaseIt extends ConsoleApp
         }
 
         $version = $this->echoLastReleases($repository)->askVersion();
-        $this->console->writeLines($this->createRelease($version))
+        $this->console->writeLines($repository->createRelease($version))
                       ->writeLine('Successfully created release ' . $version);
         return 0;
     }
@@ -122,10 +122,10 @@ class ReleaseIt extends ConsoleApp
                 $this->console->writeLine($repositoryStatus->readLine());
             }
 
-            return false;
+            return true;
         }
 
-        return true;
+        return false;
     }
 
     /**
@@ -154,7 +154,7 @@ class ReleaseIt extends ConsoleApp
     {
         while (true) {
             try {
-                return new Version($this->console->prompt('Please name the version to release (press Ctrl-C to abort): ')
+                return new Version($this->console->prompt('Please name the version to release (press Ctrl+C to abort): ')
                                                  ->unsecure()
                 );
             } catch (IllegalArgumentException $e) {
