@@ -66,12 +66,12 @@ class GitRepository implements Repository
      */
     public function getBranch()
     {
-        $output = $this->execute('git branch | cut -c 3-', 'Failure while retrieving current branch');
+        $output = $this->execute('git branch', 'Failure while retrieving current branch');
         if (!isset($output[0])) {
             throw new RepositoryError('Failure while retrieving current branch');
         }
 
-        return $output[0];
+        return substr($output[0], 2);
     }
 
     /**

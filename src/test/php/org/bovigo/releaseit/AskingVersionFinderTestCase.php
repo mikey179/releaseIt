@@ -67,7 +67,7 @@ class AskingVersionFinderTestCase extends \PHPUnit_Framework_TestCase
      */
     public function writesLastReleasesToConsole()
     {
-        $this->mockRepository->expects(($this->once()))
+        $this->mockRepository->expects($this->once())
                              ->method('getLastReleases')
                              ->will($this->returnValue(array('v1.0.0', 'v1.0.1')));
         $this->mockConsole->expects($this->at(1))
@@ -89,7 +89,7 @@ class AskingVersionFinderTestCase extends \PHPUnit_Framework_TestCase
      */
     public function repromptsUntilValidVersionNumberEntered()
     {
-        $this->mockRepository->expects(($this->once()))
+        $this->mockRepository->expects($this->once())
                              ->method('getLastReleases')
                              ->will($this->returnValue(array()));
         $this->mockConsole->expects($this->exactly(2))
