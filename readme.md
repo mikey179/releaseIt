@@ -1,7 +1,14 @@
 # ReleaseIt
 
-A tool to create releases of composer packages from checkout. It supports both
+A tool to create releases of Composer packages from checkout. It supports both
 Git and SVN repositories.
+
+What it does: determining what the version number of the release should be and
+create the according tag in Git or SVN.
+
+What it doesn't do: ensure the release is listed on packagist.org or any other
+Composer repository. It is assumed there are mechanisms in place which automatically
+detect new version tags and add them to the according repository.
 
 
 ## Usage
