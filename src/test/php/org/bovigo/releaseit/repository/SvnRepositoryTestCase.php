@@ -9,6 +9,7 @@
  */
 namespace org\bovigo\releaseit\repository;
 use net\stubbles\lang\exception\RuntimeException;
+use org\bovigo\releaseit\Series;
 use org\bovigo\releaseit\Version;
 use org\bovigo\vfs\vfsStream;
 /**
@@ -215,7 +216,7 @@ class SvnRepositoryTestCase extends \PHPUnit_Framework_TestCase
                            ->with($this->equalTo('svn list http://svn.example.org/svn/foo/tags | grep "v1.0" | sort -r | head -2'))
                            ->will(($this->returnValue(array('v1.0.0', 'v1.0.1'))));
         $this->assertEquals(array('v1.0.0', 'v1.0.1'),
-                            $this->svnRepository->getLastReleases('v1.0', 2)
+                            $this->svnRepository->getLastReleases(new Series('1.0'), 2)
         );
     }
 
