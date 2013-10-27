@@ -135,6 +135,26 @@ class ReleaseItTestCase extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
+    public function stopsWithExitCode23IfVersionFinderCanNotProvideVersionForRelease()
+    {
+        $mockRepository = $this->createMockRepository();
+        $mockRepository->expects(($this->once()))
+                       ->method('isDirty')
+                       ->will($this->returnValue(false));
+        $this->mockVersionFinder->expects(($this->once()))
+                               ->method('find')
+                               ->will($this->returnValue(null));
+        $mockRepository->expects(($this->never()))
+                       ->method('createRelease');
+        $this->mockConsole->expects($this->once())
+                          ->method('writeLine')
+                          ->with($this->equalTo('Can not create release, unable to find a version for this release.'));
+        $this->assertEquals(23, $this->releaseIt->run());
+    }
+
+    /**
+     * @test
+     */
     public function createsReleaseWithVersionDeliveredByVersionFinder()
     {
         $mockRepository = $this->createMockRepository();

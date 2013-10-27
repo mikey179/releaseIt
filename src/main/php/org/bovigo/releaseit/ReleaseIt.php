@@ -10,6 +10,7 @@
 namespace org\bovigo\releaseit;
 use net\stubbles\console\Console;
 use net\stubbles\console\ConsoleApp;
+use net\stubbles\ioc\Binder;
 use org\bovigo\releaseit\composer\Package;
 use org\bovigo\releaseit\composer\InvalidPackage;
 use org\bovigo\releaseit\repository\Repository;
@@ -57,7 +58,13 @@ class ReleaseIt extends ConsoleApp
         return array(self::createArgumentsBindingModule(),
                      self::createConsoleBindingModule(),
                      self::createPropertiesBindingModule($projectPath)
-                         ->withCurrentWorkingDirectory()
+                         ->withCurrentWorkingDirectory(),
+                     function(Binder $binder)
+                     {
+                         $binder->bindList('org\bovigo\releaseit\VersionFinder')
+                                ->withValue('org\bovigo\releaseit\NextSeriesVersionFinder')
+                                ->withValue('org\bovigo\releaseit\AskingVersionFinder');
+                     }
         );
     }
 
@@ -102,6 +109,11 @@ class ReleaseIt extends ConsoleApp
         }
 
         $version = $this->versionFinder->find($package, $repository);
+        if (null === $version) {
+            $this->console->writeLine('Can not create release, unable to find a version for this release.');
+            return 23;
+        }
+
         $this->console->writeLines($repository->createRelease($version))
                       ->writeLine('Successfully created release ' . $version);
         return 0;
