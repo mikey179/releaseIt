@@ -8,6 +8,7 @@
  * @package  org\bovigo\releaseit
  */
 namespace org\bovigo\releaseit\composer;
+use org\bovigo\releaseit\Series;
 use org\bovigo\vfs\vfsStream;
 /**
  * Test for org\bovigo\releaseit\composer\Package.
@@ -109,7 +110,7 @@ class PackageTestCase extends \PHPUnit_Framework_TestCase
         $file = vfsStream::newFile('composer.json')
                          ->withContent('{"extra": { "branch-alias": { "dev-master": "1.0.x-dev"}}}')
                          ->at(vfsStream::setup());
-        $this->assertEquals(new Series('v1.0'),
+        $this->assertEquals(new Series('1.0'),
                             Package::fromFile($file->url())
                                    ->getSeries('dev-master')
         );

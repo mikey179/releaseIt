@@ -85,6 +85,6 @@ class Package
             return null;
         }
 
-        return new Series(str_replace('.x-dev', $branchAlias));
+        return new Series(str_replace('.x-dev', '', $branchAlias));
     }
 }

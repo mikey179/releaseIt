@@ -52,6 +52,34 @@ class Version
     }
 
     /**
+     * increases minor number
+     *
+     * Will return a new instance and leave current instance unchanged.
+     *
+     * @return  Version
+     */
+    public function increaseMinor()
+    {
+        list($major, $minor) = explode('.', $this->number);
+        $minor++;
+        return new Version($major . '.' . $minor . '.0');
+    }
+
+    /**
+     * increases patch level
+     *
+     * Will return a new instance and leave current instance unchanged.
+     *
+     * @return  Version
+     */
+    public function increasePatchLevel()
+    {
+        list($major, $minor, $patchLevel) = explode('.', $this->number);
+        $patchLevel++;
+        return new Version($major . '.' . $minor . '.' . $patchLevel);
+    }
+
+    /**
      * returns string representation
      *
      * @return  string
