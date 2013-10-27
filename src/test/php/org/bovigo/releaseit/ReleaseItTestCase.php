@@ -88,6 +88,8 @@ class ReleaseItTestCase extends \PHPUnit_Framework_TestCase
                                    $this->mockVersionFinder,
                                    vfsStream::setup()->url()
                      );
+        $this->mockConsole->expects($this->once())
+                          ->method('writeErrorLine');
         $this->mockRepoDetector->expects(($this->never()))
                                ->method('detect');
         $this->assertEquals(21, $releaseIt->run());
@@ -127,7 +129,7 @@ class ReleaseItTestCase extends \PHPUnit_Framework_TestCase
                        ->method('readStatus')
                        ->will($this->returnValue($mockRepositoryStatus));
         $this->mockConsole->expects($this->at(1))
-                          ->method('writeLine')
+                          ->method('writeErrorLine')
                           ->with($this->equalTo('A  foo.php'));
         $this->assertEquals(22, $this->releaseIt->run());
     }
@@ -147,7 +149,7 @@ class ReleaseItTestCase extends \PHPUnit_Framework_TestCase
         $mockRepository->expects(($this->never()))
                        ->method('createRelease');
         $this->mockConsole->expects($this->once())
-                          ->method('writeLine')
+                          ->method('writeErrorLine')
                           ->with($this->equalTo('Can not create release, unable to find a version for this release.'));
         $this->assertEquals(23, $this->releaseIt->run());
     }

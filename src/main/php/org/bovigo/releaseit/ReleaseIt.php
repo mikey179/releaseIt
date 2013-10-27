@@ -99,7 +99,7 @@ class ReleaseIt extends ConsoleApp
         try {
             $package = Package::fromFile($this->cwd . DIRECTORY_SEPARATOR . 'composer.json');
         } catch (InvalidPackage $ip) {
-            $this->console->writeLine($ip->getMessage());
+            $this->console->writeErrorLine($ip->getMessage());
             return 21;
         }
 
@@ -110,7 +110,7 @@ class ReleaseIt extends ConsoleApp
 
         $version = $this->versionFinder->find($package, $repository);
         if (null === $version) {
-            $this->console->writeLine('Can not create release, unable to find a version for this release.');
+            $this->console->writeErrorLine('Can not create release, unable to find a version for this release.');
             return 23;
         }
 
@@ -128,10 +128,10 @@ class ReleaseIt extends ConsoleApp
     private function isDirty(Repository $repository)
     {
         if ($repository->isDirty()) {
-            $this->console->writeLine('Can\'t create release, working directory not clean.');
+            $this->console->writeErrorLine('Can\'t create release, working directory not clean.');
             $repositoryStatus = $repository->readStatus();
             while (!$repositoryStatus->eof()) {
-                $this->console->writeLine($repositoryStatus->readLine());
+                $this->console->writeErrorLine($repositoryStatus->readLine());
             }
 
             return true;
