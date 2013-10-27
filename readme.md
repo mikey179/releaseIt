@@ -8,7 +8,7 @@ create the according tag in Git or SVN.
 
 What it doesn't do: ensure the release is listed on packagist.org or any other
 Composer repository. It is assumed there are mechanisms in place which automatically
-detect new version tags and add them to the according repository.
+detect new version tags and add them to the relevant repository accordingly.
 
 
 ## Usage
