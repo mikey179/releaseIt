@@ -10,7 +10,8 @@
 namespace org\bovigo\releaseit;
 use net\stubbles\console\Console;
 use net\stubbles\console\ConsoleApp;
-use net\stubbles\lang\exception\IllegalArgumentException;
+use org\bovigo\releaseit\composer\Package;
+use org\bovigo\releaseit\composer\InvalidPackage;
 use org\bovigo\releaseit\repository\Repository;
 use org\bovigo\releaseit\repository\RepositoryDetector;
 /**
@@ -32,6 +33,12 @@ class ReleaseIt extends ConsoleApp
      * @type  RepositoryDetector
      */
     private $repoDetector;
+    /**
+     * finds version for release to create
+     *
+     * @type  VersionFinder
+     */
+    private $versionFinder;
     /**
      * current working directory
      *
@@ -59,15 +66,20 @@ class ReleaseIt extends ConsoleApp
      *
      * @param  Console             $console
      * @param  RepositoryDetector  $repoDetector
+     * @param  VersionFinder       $versionFinder
      * @param  string              $cwd
      * @Inject
      * @Named{cwd}('net.stubbles.cwd')
      */
-    public function __construct(Console $console, RepositoryDetector $repoDetector, $cwd)
+    public function __construct(Console $console,
+                                RepositoryDetector $repoDetector,
+                                VersionFinder $versionFinder,
+                                $cwd)
     {
-        $this->console      = $console;
-        $this->repoDetector = $repoDetector;
-        $this->cwd          = $cwd;
+        $this->console       = $console;
+        $this->repoDetector  = $repoDetector;
+        $this->versionFinder = $versionFinder;
+        $this->cwd           = $cwd;
     }
 
     /**
@@ -77,7 +89,10 @@ class ReleaseIt extends ConsoleApp
      */
     public function run()
     {
-        if (!$this->isComposerPackage()) {
+        try {
+            $package = Package::fromFile($this->cwd . DIRECTORY_SEPARATOR . 'composer.json');
+        } catch (InvalidPackage $ip) {
+            $this->console->writeLine($ip->getMessage());
             return 21;
         }
 
@@ -86,25 +101,10 @@ class ReleaseIt extends ConsoleApp
             return 22;
         }
 
-        $version = $this->echoLastReleases($repository)->askVersion();
+        $version = $this->versionFinder->find($package, $repository);
         $this->console->writeLines($repository->createRelease($version))
                       ->writeLine('Successfully created release ' . $version);
         return 0;
-    }
-
-    /**
-     * checks if working directory is a composer package
-     *
-     * @return  bool
-     */
-    private function isComposerPackage()
-    {
-        if (!file_exists($this->cwd . DIRECTORY_SEPARATOR . 'composer.json')) {
-            $this->console->writeLine('No composer.json found - are you sure this is a composer package?');
-            return false;
-        }
-
-        return true;
     }
 
     /**
@@ -126,40 +126,5 @@ class ReleaseIt extends ConsoleApp
         }
 
         return false;
-    }
-
-    /**
-     * echos last releases for given repository
-     *
-     * @param   Repository  $repository
-     * @return  ReleaseIt
-     */
-    private function echoLastReleases(Repository $repository)
-    {
-        $this->console->writeLine('Last 5 releases:');
-        foreach ($repository->getLastReleases() as $release) {
-            $this->console->writeLine($release);
-        }
-
-        $this->console->writeLine('');
-        return $this;
-    }
-
-    /**
-     * asks for the new version
-     *
-     * @return  Version
-     */
-    private function askVersion()
-    {
-        while (true) {
-            try {
-                return new Version($this->console->prompt('Please name the version to release (press Ctrl+C to abort): ')
-                                                 ->unsecure()
-                );
-            } catch (IllegalArgumentException $e) {
-                $this->console->writeLine($e->getMessage());
-            }
-        }
     }
 }

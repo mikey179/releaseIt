@@ -34,22 +34,30 @@ class ReleaseItTestCase extends \PHPUnit_Framework_TestCase
      * @type  \PHPUnit_Framework_MockObject_MockObject
      */
     private $mockRepoDetector;
+    /**
+     * mocked version finder
+     *
+     * @type  \PHPUnit_Framework_MockObject_MockObject
+     */
+    private $mockVersionFinder;
 
     /**
      * set up test environment
      */
     public function setUp()
     {
-        $this->mockConsole      = $this->getMockBuilder('net\stubbles\console\Console')
-                                       ->disableOriginalConstructor()
-                                       ->getMock();
-        $this->mockRepoDetector = $this->getMockBuilder('org\bovigo\releaseit\repository\RepositoryDetector')
-                                       ->disableOriginalConstructor()
-                                       ->getMock();
-        $root                   = vfsStream::setup();
-        vfsStream::newFile('composer.json')->at($root);
+        $this->mockConsole       = $this->getMockBuilder('net\stubbles\console\Console')
+                                        ->disableOriginalConstructor()
+                                        ->getMock();
+        $this->mockRepoDetector  = $this->getMockBuilder('org\bovigo\releaseit\repository\RepositoryDetector')
+                                        ->disableOriginalConstructor()
+                                        ->getMock();
+        $this->mockVersionFinder = $this->getMock('org\bovigo\releaseit\VersionFinder');
+        $root                    = vfsStream::setup();
+        vfsStream::newFile('composer.json')->withContent('{}')->at($root);
         $this->releaseIt        = new ReleaseIt($this->mockConsole,
                                                 $this->mockRepoDetector,
+                                                $this->mockVersionFinder,
                                                 $root->url()
                                   );
     }
@@ -77,6 +85,7 @@ class ReleaseItTestCase extends \PHPUnit_Framework_TestCase
     {
         $releaseIt = new ReleaseIt($this->mockConsole,
                                    $this->mockRepoDetector,
+                                   $this->mockVersionFinder,
                                    vfsStream::setup()->url()
                      );
         $this->mockRepoDetector->expects(($this->never()))
@@ -126,65 +135,27 @@ class ReleaseItTestCase extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function writesLastReleasesToConsole()
+    public function createsReleaseWithVersionDeliveredByVersionFinder()
     {
         $mockRepository = $this->createMockRepository();
         $mockRepository->expects(($this->once()))
                        ->method('isDirty')
                        ->will($this->returnValue(false));
-        $mockRepository->expects(($this->once()))
-                       ->method('getLastReleases')
-                       ->will($this->returnValue(array('v1.0.0', 'v1.0.1')));
-        $this->mockConsole->expects($this->at(1))
-                          ->method('writeLine')
-                          ->with($this->equalTo('v1.0.0'));
-        $this->mockConsole->expects($this->at(2))
-                          ->method('writeLine')
-                          ->with($this->equalTo('v1.0.1'));
-        $this->mockConsole->expects($this->at(4))
-                          ->method('prompt')
-                          ->will($this->returnValue(ValueReader::forValue('v1.1.0')));
+        $version = new Version('v1.1.0');
+        $this->mockVersionFinder->expects(($this->once()))
+                               ->method('find')
+                               ->will($this->returnValue($version));
         $mockRepository->expects(($this->once()))
                        ->method('createRelease')
-                       ->with($this->equalTo(new Version('v1.1.0')))
-                       ->will($this->returnValue(array('foo', 'bar')));
-        $this->mockConsole->expects($this->at(5))
-                          ->method('writeLines')
-                          ->with($this->equalTo(array('foo', 'bar')))
-                          ->will($this->returnSelf());
-        $this->mockConsole->expects($this->at(6))
-                          ->method('writeLine')
-                          ->with($this->equalTo('Successfully created release v1.1.0'));
-        $this->assertEquals(0, $this->releaseIt->run());
-    }
-
-    /**
-     * @test
-     */
-    public function repromptsUntilValidVersionNumberEntered()
-    {
-        $mockRepository = $this->createMockRepository();
-        $mockRepository->expects(($this->once()))
-                       ->method('isDirty')
-                       ->will($this->returnValue(false));
-        $mockRepository->expects(($this->once()))
-                       ->method('getLastReleases')
-                       ->will($this->returnValue(array()));
-        $this->mockConsole->expects($this->exactly(2))
-                          ->method('prompt')
-                          ->will($this->onConsecutiveCalls(ValueReader::forValue('foo'),
-                                                           ValueReader::forValue('v1.1.0')
-                                 )
-                            );
-        $mockRepository->expects(($this->once()))
-                       ->method('createRelease')
-                       ->with($this->equalTo(new Version('v1.1.0')))
+                       ->with($this->equalTo($version))
                        ->will($this->returnValue(array('foo', 'bar')));
         $this->mockConsole->expects($this->once())
                           ->method('writeLines')
                           ->with($this->equalTo(array('foo', 'bar')))
                           ->will($this->returnSelf());
-
+        $this->mockConsole->expects($this->once())
+                          ->method('writeLine')
+                          ->with($this->equalTo('Successfully created release v1.1.0'));
         $this->assertEquals(0, $this->releaseIt->run());
     }
 
