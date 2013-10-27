@@ -13,7 +13,7 @@ use org\bovigo\releaseit\repository\Repository;
 /**
  * Finds version for release to create.
  *
- * @ImplementedBy(org\bovigo\releaseit\AskingVersionFinder.class)
+ * @ImplementedBy(org\bovigo\releaseit\VersionFinderChain.class)
  */
 interface VersionFinder
 {
