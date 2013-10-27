@@ -154,7 +154,7 @@ class GitRepositoryTestCase extends \PHPUnit_Framework_TestCase
     {
         $this->mockExecutor->expects($this->once())
                            ->method('executeDirect')
-                           ->will(($this->returnValue(array('master'))));
+                           ->will(($this->returnValue(array('* master'))));
         $this->assertEquals('master',
                             $this->gitRepository->getBranch()
         );
