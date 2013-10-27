@@ -74,4 +74,44 @@ class PackageTestCase extends \PHPUnit_Framework_TestCase
                                    ->getBranchAlias('dev-master')
         );
     }
+
+    /**
+     * @test
+     */
+    public function getSeriesWithoutAnyBranchAliasDefinedReturnsNull()
+    {
+        $file = vfsStream::newFile('composer.json')
+                         ->withContent('{}')
+                         ->at(vfsStream::setup());
+        $this->assertNull(Package::fromFile($file->url())
+                                 ->getSeries('dev-foo')
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function getSeriesForNonConfiguredBranchAliasReturnsNull()
+    {
+        $file = vfsStream::newFile('composer.json')
+                         ->withContent('{"extra": { "branch-alias": { "dev-master": "1.0.x-dev"}}}')
+                         ->at(vfsStream::setup());
+        $this->assertNull(Package::fromFile($file->url())
+                                 ->getSeries('dev-foo')
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function getSeriesForConfiguredBranchAlias()
+    {
+        $file = vfsStream::newFile('composer.json')
+                         ->withContent('{"extra": { "branch-alias": { "dev-master": "1.0.x-dev"}}}')
+                         ->at(vfsStream::setup());
+        $this->assertEquals(new Series('v1.0'),
+                            Package::fromFile($file->url())
+                                   ->getSeries('dev-master')
+        );
+    }
 }

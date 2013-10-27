@@ -10,6 +10,7 @@
 namespace org\bovigo\releaseit\composer;
 use Hampel\Json\Json;
 use Hampel\Json\JsonException;
+use org\bovigo\releaseit\Series;
 /**
  * Represents a composer package.
  */
@@ -67,5 +68,23 @@ class Package
         }
 
         return null;
+    }
+
+    /**
+     * returns series for given branch
+     *
+     * If no branch alias is defined for given branch return value is null.
+     *
+     * @param   string  $branch
+     * @return  Series
+     */
+    public function getSeries($branch)
+    {
+        $branchAlias = $this->getBranchAlias($branch);
+        if (null === $branchAlias) {
+            return null;
+        }
+
+        return new Series(str_replace('.x-dev', $branchAlias));
     }
 }
