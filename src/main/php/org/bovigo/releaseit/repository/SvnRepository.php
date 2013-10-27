@@ -24,6 +24,10 @@ class SvnRepository implements Repository
     private $executor;
     /**
      * svn url of checkout from repository
+     */
+    private $svnUrl;
+    /**
+     * svn url for tags
      *
      * @type  string
      */
@@ -48,7 +52,8 @@ class SvnRepository implements Repository
     {
         foreach ($this->execute('svn info', 'Failure while checking svn info') as $svnInfoLine) {
             if (substr($svnInfoLine, 0, 5) === 'URL: ') {
-                $this->svnTagsUrl = $this->findTagsUrl(str_replace('URL: ', '', $svnInfoLine));
+                $this->svnUrl     = str_replace('URL: ', '', $svnInfoLine);
+                $this->svnTagsUrl = $this->findTagsUrl($this->svnUrl);
             }
         }
 
@@ -99,6 +104,21 @@ class SvnRepository implements Repository
     public function readStatus()
     {
         return $this->execute('svn status', 'Failure while checking svn status', 'executeAsync');
+    }
+
+    /**
+     * returns branch of repository
+     *
+     * @return  string
+     */
+    public function getBranch()
+    {
+        if (strstr($this->svnUrl, '/trunk') !== false) {
+            return 'trunk';
+        }
+
+        $svnUrlParts = explode('/', $this->svnUrl);
+        return array_pop($svnUrlParts);
     }
 
     /**

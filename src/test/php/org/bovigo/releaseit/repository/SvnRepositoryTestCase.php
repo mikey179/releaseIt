@@ -168,6 +168,31 @@ class SvnRepositoryTestCase extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
+     */
+    public function getBranchReturnsTrunkWhenWorkspaceIsTrunkCheckout()
+    {
+        $this->assertEquals('trunk',
+                            $this->svnRepository->getBranch()
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function getBranchReturnsBranchNameWhenWorkspaceIsBranchCheckout()
+    {
+        $mockExecutor  = $this->getMock('net\stubbles\console\Executor');
+        $mockExecutor->expects($this->once())
+                     ->method('executeDirect')
+                     ->will($this->returnValue(array('URL: http://svn.example.org/svn/foo/branches/cool-new-feature')));
+        $svnRepository = new SvnRepository($mockExecutor);
+        $this->assertEquals('cool-new-feature',
+                            $svnRepository->getBranch()
+        );
+    }
+
+    /**
+     * @test
      * @expectedException  org\bovigo\releaseit\repository\RepositoryError
      * @expectedExceptionMessage   Failure while retrieving last releases
      */

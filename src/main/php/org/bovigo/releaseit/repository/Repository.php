@@ -29,6 +29,13 @@ interface Repository
     public function readStatus();
 
     /**
+     * returns branch of repository
+     *
+     * @return  string
+     */
+    public function getBranch();
+
+    /**
      * returns a list of the last releases
      *
      * @param   string  $series  limit releases to those of a certain series, i.e. v2 or v2.1, defaults to all

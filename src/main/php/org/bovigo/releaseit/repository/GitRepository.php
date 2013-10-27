@@ -60,6 +60,21 @@ class GitRepository implements Repository
     }
 
     /**
+     * returns branch of repository
+     *
+     * @return  string
+     */
+    public function getBranch()
+    {
+        $output = $this->execute('git branch | cut -c 3-', 'Failure while retrieving current branch');
+        if (!isset($output[0])) {
+            throw new RepositoryError('Failure while retrieving current branch');
+        }
+
+        return $output[0];
+    }
+
+    /**
      * returns a list of the last releases
      *
      * @param   string  $series  limit releases to those of a certain series, i.e. v2 or v2.1, defaults to all

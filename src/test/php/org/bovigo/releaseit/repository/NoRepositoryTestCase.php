@@ -50,6 +50,14 @@ class NoRepositoryTestCase extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
+    public function hasNoBranch()
+    {
+        $this->assertNull($this->noRepository->getBranch());
+    }
+
+    /**
+     * @test
+     */
     public function hasNoLastReleases()
     {
         $this->assertEquals(array(), $this->noRepository->getLastReleases());

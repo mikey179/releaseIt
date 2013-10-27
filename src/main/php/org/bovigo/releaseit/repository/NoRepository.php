@@ -36,6 +36,16 @@ class NoRepository implements Repository
     }
 
     /**
+     * returns branch of repository
+     *
+     * @return  string
+     */
+    public function getBranch()
+    {
+        return null;
+    }
+
+    /**
      * returns a list of the last releases
      *
      * @param   string  $series  limit releases to those of a certain series, i.e. v2 or v2.1, defaults to all

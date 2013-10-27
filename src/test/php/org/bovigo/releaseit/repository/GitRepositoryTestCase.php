@@ -123,6 +123,45 @@ class GitRepositoryTestCase extends \PHPUnit_Framework_TestCase
     /**
      * @test
      * @expectedException  org\bovigo\releaseit\repository\RepositoryError
+     * @expectedExceptionMessage   Failure while retrieving current branch
+     */
+    public function getBranchThrowsRepositoryErrorWhenGitBranchFails()
+    {
+        $this->mockExecutor->expects($this->once())
+                           ->method('executeDirect')
+                           ->will($this->throwException(new RuntimeException('error')));
+        $this->gitRepository->getBranch();
+    }
+
+    /**
+     * @test
+     * @expectedException  org\bovigo\releaseit\repository\RepositoryError
+     * @expectedExceptionMessage   Failure while retrieving current branch
+     */
+    public function getBranchThrowsRepositoryErrorWhenGitBranchReturnsNoOutput()
+    {
+        $this->mockExecutor->expects($this->once())
+                           ->method('executeDirect')
+                           ->will(($this->returnValue(array())));
+        $this->gitRepository->getBranch();
+    }
+
+    /**
+     * @test
+     */
+    public function getBranchReturnsCurrentBranchName()
+    {
+        $this->mockExecutor->expects($this->once())
+                           ->method('executeDirect')
+                           ->will(($this->returnValue(array('master'))));
+        $this->assertEquals('master',
+                            $this->gitRepository->getBranch()
+        );
+    }
+
+    /**
+     * @test
+     * @expectedException  org\bovigo\releaseit\repository\RepositoryError
      * @expectedExceptionMessage   Failure while retrieving last releases
      */
     public function getLastReleasesThrowsRepositoryErrorWhenGitTagFails()
