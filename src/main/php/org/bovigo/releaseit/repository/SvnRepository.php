@@ -130,8 +130,13 @@ class SvnRepository implements Repository
      */
     public function getLastReleases($series = 'v', $amount = 5)
     {
-        return $this->execute('svn list ' . $this->svnTagsUrl . ' | grep "' . $series . '" | sort -r | head -' . $amount,
-                              'Failure while retrieving last releases'
+        return array_map(function($value)
+                         {
+                            return rtrim($value, '/');
+                         },
+                         $this->execute('svn list ' . $this->svnTagsUrl . ' | grep "' . $series . '" | sort -r | head -' . $amount,
+                                        'Failure while retrieving last releases'
+                         )
         );
     }
 
