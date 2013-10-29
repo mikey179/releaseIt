@@ -50,7 +50,7 @@ class VersionTestCase extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function increaseMinorReturnsNewVersioNumber()
+    public function increaseMinorReturnsNewVersionNumber()
     {
         $version = new Version('1.1.0');
         $this->assertEquals('v1.2.0', (string) $version->increaseMinor());
@@ -68,7 +68,7 @@ class VersionTestCase extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function increasePatchLevelReturnsNewVersioNumber()
+    public function increasePatchLevelReturnsNewVersionNumber()
     {
         $version = new Version('1.1.0');
         $this->assertEquals('v1.1.1', (string) $version->increasePatchLevel());
