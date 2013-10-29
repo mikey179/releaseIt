@@ -6,8 +6,8 @@
     "description": "Helps to create releases from current checkout",
     "require": {
         "php": ">=5.3.0",
-        "stubbles/core": "~3.1",
-        "stubbles/console": "~2.5",
+        "stubbles/core": "~3.2",
+        "stubbles/console": "~2.6",
         "herrera-io/version": "~1.0",
         "hampel/json": "~1.0"
     },

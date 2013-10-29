@@ -60,7 +60,7 @@ class AskingVersionFinder implements VersionFinder
             $this->console->writeLine($release);
         }
 
-        $this->console->writeLine('');
+        $this->console->writeEmptyLine();
         return $this;
     }
 
