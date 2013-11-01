@@ -40,7 +40,7 @@ class Package
      * @return  Package
      * @throws  InvalidPackage
      */
-    public function fromFile($filename)
+    public static function fromFile($filename)
     {
         if (!file_exists($filename)) {
             throw new InvalidPackage('No composer.json found - are you sure this is a composer package?');
