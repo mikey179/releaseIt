@@ -15,7 +15,7 @@ detect new version tags and add them to the relevant repository accordingly.
 
 1. cd into the directory with a checkout of the composer package you want to release
 1. ensure there are no uncommitted changes (ReleaseIt will deny creating a release then)
-1. type `releaseIt` and follow instructions
+1. type `releaseIt.phar` and follow instructions
 
 Done! You created a new release of your composer package. Congratulations!
 
