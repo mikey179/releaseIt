@@ -10,6 +10,8 @@ What it doesn't do: ensure the release is listed on packagist.org or any other
 Composer repository. It is assumed there are mechanisms in place which automatically
 detect new version tags and add them to the relevant repository accordingly.
 
+[![Build Status](https://secure.travis-ci.org/mikey179/releaseIt.png)](http://travis-ci.org/mikey179/releaseIt)
+
 
 ## Usage
 
