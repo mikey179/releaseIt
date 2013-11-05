@@ -26,7 +26,8 @@ To determine the version of the next release there are several possibilies:
 
 ### Retrieve next version by branch-alias
 
-Composer allows to define the `branch-alias` for the current branch:
+Composer allows to use the `branch-alias` from `composer.json` for the current
+branch:
 
 ```json
 "extra": {
@@ -35,6 +36,9 @@ Composer allows to define the `branch-alias` for the current branch:
     },
 }
 ```
+
+See http://getcomposer.org/doc/articles/aliases.md#branch-alias for more information
+on `branch-alias`.
 
 ReleaseIt will check the branch of the current checkout and look it up in the
 list of branch-alias definitions. If it finds an entry it checks for the last
@@ -70,7 +74,7 @@ $ wget http://releaseit.bovigo.org/releaseIt.phar
 $ chmod +x releaseIt.phar
 ```
 
-We recommend moving the file into a directory which is in `$PATH`.
+It is recommended to move the file into a directory which is in `$PATH`.
 
 ### Manual Installation from Source
 
