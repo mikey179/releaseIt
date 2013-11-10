@@ -1,5 +1,8 @@
 # ReleaseIt
 
+[![Build Status](https://secure.travis-ci.org/mikey179/releaseIt.png)](http://travis-ci.org/mikey179/releaseIt)
+[![Coverage Status](https://coveralls.io/repos/mikey179/releaseIt/badge.png?branch=master)](https://coveralls.io/r/mikey179/releaseIt?branch=master)
+
 A tool to create releases of Composer packages from checkout. It supports both
 Git and SVN repositories.
 
