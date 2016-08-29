@@ -15,8 +15,8 @@
         "phpunit/phpunit": "^5.5"
     },
     "autoload": {
-        "psr-0": {
-            "org\\bovigo\\releaseit": "src/main/php"
+        "psr-4": {
+            "org\\bovigo\\releaseit\\": "src/main/php"
         }
     },
     "bin": ["bin/releaseIt"],
