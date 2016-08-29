@@ -64,13 +64,9 @@ class Package
      * @param   string  $branch
      * @return  string
      */
-    public function getBranchAlias(string $branch)
+    public function branchAlias(string $branch)
     {
-        if (isset($this->config['extra']['branch-alias'][$branch])) {
-            return $this->config['extra']['branch-alias'][$branch];
-        }
-
-        return null;
+        return $this->config['extra']['branch-alias'][$branch] ?? null;
     }
 
     /**
@@ -81,9 +77,9 @@ class Package
      * @param   string  $branch
      * @return  Series
      */
-    public function getSeries(string $branch)
+    public function series(string $branch)
     {
-        $branchAlias = $this->getBranchAlias($branch);
+        $branchAlias = $this->branchAlias($branch);
         if (null === $branchAlias) {
             return null;
         }

@@ -61,7 +61,7 @@ class NextSeriesVersionFinderTestCase extends \PHPUnit_Framework_TestCase
     public function canNotFindVersionIfSeriesCanNotBeDeterminedFromBranch()
     {
         $this->mockRepository->expects($this->any())
-                             ->method('getBranch')
+                             ->method('branch')
                              ->will($this->returnValue('cool-new-feature'));
         $this->mockConsole->expects($this->once())
                           ->method('writeLine')
@@ -75,10 +75,10 @@ class NextSeriesVersionFinderTestCase extends \PHPUnit_Framework_TestCase
     public function returnsNoVersionIfUserDeniesFirstVersionInSeries()
     {
         $this->mockRepository->expects($this->once())
-                             ->method('getBranch')
+                             ->method('branch')
                              ->will($this->returnValue('master'));
         $this->mockRepository->expects(($this->once()))
-                             ->method('getLastReleases')
+                             ->method('lastReleases')
                              ->with($this->equalTo(new Series('1.0')), $this->equalTo(1))
                              ->will($this->returnValue([]));
         $this->mockConsole->expects($this->once())
@@ -96,10 +96,10 @@ class NextSeriesVersionFinderTestCase extends \PHPUnit_Framework_TestCase
     public function returnsFirstVersionInSeriesIfNoReleaseAvailableInThisSeries()
     {
         $this->mockRepository->expects($this->once())
-                             ->method('getBranch')
+                             ->method('branch')
                              ->will($this->returnValue('master'));
         $this->mockRepository->expects(($this->once()))
-                             ->method('getLastReleases')
+                             ->method('lastReleases')
                              ->with($this->equalTo(new Series('1.0')), $this->equalTo(1))
                              ->will($this->returnValue([]));
         $this->mockConsole->expects($this->once())
@@ -119,10 +119,10 @@ class NextSeriesVersionFinderTestCase extends \PHPUnit_Framework_TestCase
     public function returnsNoVersionIfUserDeniesNextVersionInSeries()
     {
         $this->mockRepository->expects($this->once())
-                             ->method('getBranch')
+                             ->method('branch')
                              ->will($this->returnValue('master'));
         $this->mockRepository->expects(($this->once()))
-                             ->method('getLastReleases')
+                             ->method('lastReleases')
                              ->with($this->equalTo(new Series('1.0')), $this->equalTo(1))
                              ->will($this->returnValue(['v1.0.1']));
         $this->mockConsole->expects($this->once())
@@ -140,10 +140,10 @@ class NextSeriesVersionFinderTestCase extends \PHPUnit_Framework_TestCase
     public function returnsNextVersionInSeriesIfReleasesAvailableInThisSeries()
     {
         $this->mockRepository->expects($this->once())
-                             ->method('getBranch')
+                             ->method('branch')
                              ->will($this->returnValue('master'));
         $this->mockRepository->expects(($this->once()))
-                             ->method('getLastReleases')
+                             ->method('lastReleases')
                              ->with($this->equalTo(new Series('1.0')), $this->equalTo(1))
                              ->will($this->returnValue(['v1.0.1']));
         $this->mockConsole->expects($this->once())

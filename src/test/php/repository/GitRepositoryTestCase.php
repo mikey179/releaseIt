@@ -113,12 +113,12 @@ class GitRepositoryTestCase extends \PHPUnit_Framework_TestCase
      * @expectedException  bovigo\releaseit\repository\RepositoryError
      * @expectedExceptionMessage   Failure while retrieving current branch
      */
-    public function getBranchThrowsRepositoryErrorWhenGitBranchFails()
+    public function branchThrowsRepositoryErrorWhenGitBranchFails()
     {
         $this->mockExecutor->expects($this->once())
                            ->method('outputOf')
                            ->will($this->throwException(new \RuntimeException('error')));
-        $this->gitRepository->getBranch();
+        $this->gitRepository->branch();
     }
 
     /**
@@ -126,24 +126,24 @@ class GitRepositoryTestCase extends \PHPUnit_Framework_TestCase
      * @expectedException  bovigo\releaseit\repository\RepositoryError
      * @expectedExceptionMessage   Failure while retrieving current branch
      */
-    public function getBranchThrowsRepositoryErrorWhenGitBranchReturnsNoOutput()
+    public function branchThrowsRepositoryErrorWhenGitBranchReturnsNoOutput()
     {
         $this->mockExecutor->expects($this->once())
                            ->method('outputOf')
                            ->will(($this->returnValue([])));
-        $this->gitRepository->getBranch();
+        $this->gitRepository->branch();
     }
 
     /**
      * @test
      */
-    public function getBranchReturnsCurrentBranchName()
+    public function branchReturnsCurrentBranchName()
     {
         $this->mockExecutor->expects($this->once())
                            ->method('outputOf')
                            ->will(($this->returnValue(['* master'])));
         $this->assertEquals('master',
-                            $this->gitRepository->getBranch()
+                            $this->gitRepository->branch()
         );
     }
 
@@ -152,26 +152,26 @@ class GitRepositoryTestCase extends \PHPUnit_Framework_TestCase
      * @expectedException  bovigo\releaseit\repository\RepositoryError
      * @expectedExceptionMessage   Failure while retrieving last releases
      */
-    public function getLastReleasesThrowsRepositoryErrorWhenGitTagFails()
+    public function lastReleasesThrowsRepositoryErrorWhenGitTagFails()
     {
         $this->mockExecutor->expects($this->once())
                            ->method('outputOf')
                            ->with($this->equalTo('git tag -l | grep "v" | sort -r | head -5'))
                            ->will($this->throwException(new \RuntimeException('error')));
-        $this->gitRepository->getLastReleases();
+        $this->gitRepository->lastReleases();
     }
 
     /**
      * @test
      */
-    public function getLastReleasesReturnsListOfLastReleases()
+    public function lastReleasesReturnsListOfLastReleases()
     {
         $this->mockExecutor->expects($this->once())
                            ->method('outputOf')
                            ->with($this->equalTo('git tag -l | grep "v1.0" | sort -r | head -2'))
                            ->will(($this->returnValue(['v1.0.0', 'v1.0.1'])));
         $this->assertEquals(['v1.0.0', 'v1.0.1'],
-                            $this->gitRepository->getLastReleases(new Series('1.0'), 2)
+                            $this->gitRepository->lastReleases(new Series('1.0'), 2)
         );
     }
 

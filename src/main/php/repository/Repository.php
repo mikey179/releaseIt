@@ -36,7 +36,7 @@ interface Repository
      *
      * @return  string
      */
-    public function getBranch(): string;
+    public function branch(): string;
 
     /**
      * returns a list of the last releases
@@ -45,7 +45,7 @@ interface Repository
      * @param   int     $amount  limit amount of releases to retrieve, defaults to 5
      * @return  string[]
      */
-    public function getLastReleases(Series $series = null, int $amount = 5): array;
+    public function lastReleases(Series $series = null, int $amount = 5): array;
 
     /**
      * creates a release with given version number

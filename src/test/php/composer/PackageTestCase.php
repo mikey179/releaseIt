@@ -40,13 +40,13 @@ class PackageTestCase extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function getBranchAliasWithoutAnyBranchAliasDefinedReturnsNull()
+    public function branchAliasWithoutAnyBranchAliasDefinedReturnsNull()
     {
         $file = vfsStream::newFile('composer.json')
                          ->withContent('{}')
                          ->at(vfsStream::setup());
         $this->assertNull(Package::fromFile($file->url())
-                                 ->getBranchAlias('dev-foo')
+                                 ->branchAlias('dev-foo')
         );
     }
 
@@ -59,7 +59,7 @@ class PackageTestCase extends \PHPUnit_Framework_TestCase
                          ->withContent('{"extra": { "branch-alias": { "dev-master": "1.0.x-dev"}}}')
                          ->at(vfsStream::setup());
         $this->assertNull(Package::fromFile($file->url())
-                                 ->getBranchAlias('dev-foo')
+                                 ->branchAlias('dev-foo')
         );
     }
 
@@ -73,47 +73,42 @@ class PackageTestCase extends \PHPUnit_Framework_TestCase
                          ->at(vfsStream::setup());
         $this->assertEquals('1.0.x-dev',
                             Package::fromFile($file->url())
-                                   ->getBranchAlias('dev-master')
+                                   ->branchAlias('dev-master')
         );
     }
 
     /**
      * @test
      */
-    public function getSeriesWithoutAnyBranchAliasDefinedReturnsNull()
+    public function seriesWithoutAnyBranchAliasDefinedReturnsNull()
     {
         $file = vfsStream::newFile('composer.json')
                          ->withContent('{}')
                          ->at(vfsStream::setup());
-        $this->assertNull(Package::fromFile($file->url())
-                                 ->getSeries('dev-foo')
-        );
+        $this->assertNull(Package::fromFile($file->url())->series('dev-foo'));
     }
 
     /**
      * @test
      */
-    public function getSeriesForNonConfiguredBranchAliasReturnsNull()
+    public function seriesForNonConfiguredBranchAliasReturnsNull()
     {
         $file = vfsStream::newFile('composer.json')
                          ->withContent('{"extra": { "branch-alias": { "dev-master": "1.0.x-dev"}}}')
                          ->at(vfsStream::setup());
-        $this->assertNull(Package::fromFile($file->url())
-                                 ->getSeries('dev-foo')
-        );
+        $this->assertNull(Package::fromFile($file->url())->series('dev-foo'));
     }
 
     /**
      * @test
      */
-    public function getSeriesForConfiguredBranchAlias()
+    public function seriesForConfiguredBranchAlias()
     {
         $file = vfsStream::newFile('composer.json')
                          ->withContent('{"extra": { "branch-alias": { "dev-master": "1.0.x-dev"}}}')
                          ->at(vfsStream::setup());
         $this->assertEquals(new Series('1.0'),
-                            Package::fromFile($file->url())
-                                   ->getSeries('dev-master')
+                            Package::fromFile($file->url())->series('dev-master')
         );
     }
 }

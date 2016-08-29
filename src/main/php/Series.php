@@ -49,7 +49,7 @@ class Series
     {
         $this->number = $this->stripLeadingV($number);
         $this->type   = $this->calculateSeriesType($number);
-        if (self::TYPE_UNKNOWN === $this->type || !Validator::isVersion($this->getAppendedNumber())) {
+        if (self::TYPE_UNKNOWN === $this->type || !Validator::isVersion($this->appendedNumber())) {
             throw new \InvalidArgumentException(
                     'Given value ' . $number . ' is not a valid series number'
             );
@@ -92,7 +92,7 @@ class Series
      *
      * @return  string
      */
-    private function getAppendedNumber(): string
+    private function appendedNumber(): string
     {
         if (self::TYPE_MAJOR === $this->type) {
             return $this->number . '.0.0';
@@ -108,9 +108,9 @@ class Series
      *
      * @return  Version
      */
-    public function getFirstVersion(): Version
+    public function firstVersion(): Version
     {
-        return new Version($this->getAppendedNumber());
+        return new Version($this->appendedNumber());
     }
 
     /**
@@ -119,7 +119,7 @@ class Series
      * @param   Version  $current
      * @return  Version
      */
-    public function getNextVersion(Version $current): Version
+    public function nextVersion(Version $current): Version
     {
         if (self::TYPE_MAJOR === $this->type) {
             return $current->increaseMinor();

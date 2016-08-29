@@ -53,7 +53,7 @@ class NoRepositoryTestCase extends \PHPUnit_Framework_TestCase
      */
     public function hasNoBranch()
     {
-        $this->assertEquals('', $this->noRepository->getBranch());
+        $this->assertEquals('', $this->noRepository->branch());
     }
 
     /**
@@ -61,7 +61,7 @@ class NoRepositoryTestCase extends \PHPUnit_Framework_TestCase
      */
     public function hasNoLastReleases()
     {
-        $this->assertEquals([], $this->noRepository->getLastReleases());
+        $this->assertEquals([], $this->noRepository->lastReleases());
     }
 
     /**

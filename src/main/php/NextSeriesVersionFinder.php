@@ -44,24 +44,24 @@ class NextSeriesVersionFinder implements VersionFinder
      */
     public function find(Package $package, Repository $repository)
     {
-        $series = $package->getSeries('dev-' . $repository->getBranch());
+        $series = $package->series('dev-' . $repository->branch());
         if (empty($series)) {
             $this->console->writeLine(
                     'Can not determine current series for branch '
-                    . $repository->getBranch()
+                    . $repository->branch()
             );
             return null;
         }
 
-        $lastReleaseInSeries = $this->getLastReleaseInSeries($series, $repository);
+        $lastReleaseInSeries = $this->lastRelease($series, $repository);
         if (null === $lastReleaseInSeries) {
-            $version = $series->getFirstVersion();
+            $version = $series->firstVersion();
             $this->console->writeLine(
                     'No release in series ' . $series . ' yet, determined '
                     . $version . ' as first version number.'
             );
         } else {
-            $version = $series->getNextVersion($lastReleaseInSeries);
+            $version = $series->nextVersion($lastReleaseInSeries);
             $this->console->writeLine(
                     'Last release in series ' . $series . ' was '
                     . $lastReleaseInSeries . ', determined ' . $version
@@ -84,9 +84,9 @@ class NextSeriesVersionFinder implements VersionFinder
      * @param   Series  $series
      * @return  Version
      */
-    private function getLastReleaseInSeries(Series $series, Repository $repository)
+    private function lastRelease(Series $series, Repository $repository)
     {
-        $lastReleaseInSeries = $repository->getLastReleases($series, 1);
+        $lastReleaseInSeries = $repository->lastReleases($series, 1);
         if (count($lastReleaseInSeries) === 0) {
             return null;
         }

@@ -55,7 +55,7 @@ class AskingVersionFinder implements VersionFinder
     private function echoLastReleases(Repository $repository): self
     {
         $this->console->writeLine('Last 5 releases:');
-        foreach ($repository->getLastReleases() as $release) {
+        foreach ($repository->lastReleases() as $release) {
             $this->console->writeLine($release);
         }
 

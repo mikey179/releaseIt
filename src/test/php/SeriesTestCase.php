@@ -60,7 +60,7 @@ class SeriesTestCase extends \PHPUnit_Framework_TestCase
     public function deliversFirstVersionOfMajorSeries()
     {
         $series = new Series('1');
-        $this->assertEquals(new Version('v1.0.0'), $series->getFirstVersion());
+        $this->assertEquals(new Version('v1.0.0'), $series->firstVersion());
     }
 
     /**
@@ -69,7 +69,7 @@ class SeriesTestCase extends \PHPUnit_Framework_TestCase
     public function deliversFirstVersionOfMinorSeries()
     {
         $series = new Series('1.1');
-        $this->assertEquals(new Version('v1.1.0'), $series->getFirstVersion());
+        $this->assertEquals(new Version('v1.1.0'), $series->firstVersion());
     }
 
     /**
@@ -78,7 +78,7 @@ class SeriesTestCase extends \PHPUnit_Framework_TestCase
     public function nextVersionInMajorSeriesIncreasesMinorNumber()
     {
         $series = new Series('1');
-        $this->assertEquals(new Version('v1.2.0'), $series->getNextVersion(new Version('v1.1.0')));
+        $this->assertEquals(new Version('v1.2.0'), $series->nextVersion(new Version('v1.1.0')));
     }
 
     /**
@@ -87,6 +87,6 @@ class SeriesTestCase extends \PHPUnit_Framework_TestCase
     public function nextVersionInMinorSeriesIncreasesPatchLevel()
     {
         $series = new Series('1.1');
-        $this->assertEquals(new Version('v1.1.3'), $series->getNextVersion(new Version('v1.1.2')));
+        $this->assertEquals(new Version('v1.1.3'), $series->nextVersion(new Version('v1.1.2')));
     }
 }

@@ -157,17 +157,17 @@ class SvnRepositoryTestCase extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function getBranchReturnsTrunkWhenWorkspaceIsTrunkCheckout()
+    public function branchReturnsTrunkWhenWorkspaceIsTrunkCheckout()
     {
         $this->assertEquals('trunk',
-                            $this->svnRepository->getBranch()
+                            $this->svnRepository->branch()
         );
     }
 
     /**
      * @test
      */
-    public function getBranchReturnsBranchNameWhenWorkspaceIsBranchCheckout()
+    public function branchReturnsBranchNameWhenWorkspaceIsBranchCheckout()
     {
         $mockExecutor  = $this->createPartialMock('stubbles\console\Executor', ['outputOf', 'executeAsync']);
         $mockExecutor->expects($this->once())
@@ -175,7 +175,7 @@ class SvnRepositoryTestCase extends \PHPUnit_Framework_TestCase
                      ->will($this->returnValue(['URL: http://svn.example.org/svn/foo/branches/cool-new-feature']));
         $svnRepository = new SvnRepository($mockExecutor);
         $this->assertEquals('cool-new-feature',
-                            $svnRepository->getBranch()
+                            $svnRepository->branch()
         );
     }
 
@@ -184,26 +184,26 @@ class SvnRepositoryTestCase extends \PHPUnit_Framework_TestCase
      * @expectedException  bovigo\releaseit\repository\RepositoryError
      * @expectedExceptionMessage   Failure while retrieving last releases
      */
-    public function getLastReleasesThrowsRepositoryErrorWhenSvnListFails()
+    public function lastReleasesThrowsRepositoryErrorWhenSvnListFails()
     {
         $this->mockExecutor->expects($this->once())
                            ->method('outputOf')
                            ->with($this->equalTo('svn list http://svn.example.org/svn/foo/tags | grep "v" | sort -r | head -5'))
                            ->will($this->throwException(new \RuntimeException('error')));
-        $this->svnRepository->getLastReleases();
+        $this->svnRepository->lastReleases();
     }
 
     /**
      * @test
      */
-    public function getLastReleasesReturnsListOfLastReleases()
+    public function lastReleasesReturnsListOfLastReleases()
     {
         $this->mockExecutor->expects($this->once())
                            ->method('outputOf')
                            ->with($this->equalTo('svn list http://svn.example.org/svn/foo/tags | grep "v1.0" | sort -r | head -2'))
                            ->will(($this->returnValue(['v1.0.0/', 'v1.0.1/'])));
         $this->assertEquals(['v1.0.0', 'v1.0.1'],
-                            $this->svnRepository->getLastReleases(new Series('1.0'), 2)
+                            $this->svnRepository->lastReleases(new Series('1.0'), 2)
         );
     }
 

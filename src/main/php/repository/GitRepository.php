@@ -71,7 +71,7 @@ class GitRepository implements Repository
      *
      * @return  string
      */
-    public function getBranch(): string
+    public function branch(): string
     {
         $output = $this->execute('git branch', 'Failure while retrieving current branch');
         if (!isset($output[0])) {
@@ -88,7 +88,7 @@ class GitRepository implements Repository
      * @param   int     $amount  limit amount of releases to retrieve, defaults to 5
      * @return  string[]
      */
-    public function getLastReleases(Series $series = null, int $amount = 5): array
+    public function lastReleases(Series $series = null, int $amount = 5): array
     {
         if (null === $series) {
             $series = 'v';
