@@ -9,9 +9,12 @@ declare(strict_types=1);
  * @package  bovigo\releaseit
  */
 namespace bovigo\releaseit;
+use bovigo\callmap\NewInstance;
 use bovigo\releaseit\composer\Package;
 use bovigo\releaseit\repository\Repository;
 use stubbles\console\Console;
+
+use function bovigo\callmap\verify;
 /**
  * Test for bovigo\releaseit\NextSeriesVersionFinder.
  */
@@ -24,11 +27,9 @@ class NextSeriesVersionFinderTestCase extends \PHPUnit_Framework_TestCase
      */
     private $nextSeriesVersionFinder;
     /**
-     * mocked console interface
-     *
-     * @type  \PHPUnit_Framework_MockObject_MockObject
+     * @type  Console
      */
-    private $mockConsole;
+    private $console;
     /**
      * package to create release for
      *
@@ -36,23 +37,21 @@ class NextSeriesVersionFinderTestCase extends \PHPUnit_Framework_TestCase
      */
     private $package;
     /**
-     * mocked repository to create release from
-     *
-     * @type  \PHPUnit_Framework_MockObject_MockObject
+     * @type  Repository
      */
-    private $mockRepository;
+    private $repository;
 
     /**
      * set up test environment
      */
     public function setUp()
     {
-        $this->mockConsole             = $this->getMockBuilder(Console::class)
-                                              ->disableOriginalConstructor()
-                                              ->getMock();
-        $this->nextSeriesVersionFinder = new NextSeriesVersionFinder($this->mockConsole);
-        $this->package                 = new Package(['extra' => ['branch-alias' => ['dev-master' => '1.0.x-dev']]]);
-        $this->mockRepository          = $this->createMock(Repository::class);
+        $this->console                 = NewInstance::stub(Console::class);
+        $this->nextSeriesVersionFinder = new NextSeriesVersionFinder($this->console);
+        $this->package                 = new Package(
+                ['extra' => ['branch-alias' => ['dev-master' => '1.0.x-dev']]]
+        );
+        $this->repository              = NewInstance::of(Repository::class);
     }
 
     /**
@@ -60,13 +59,11 @@ class NextSeriesVersionFinderTestCase extends \PHPUnit_Framework_TestCase
      */
     public function canNotFindVersionIfSeriesCanNotBeDeterminedFromBranch()
     {
-        $this->mockRepository->expects($this->any())
-                             ->method('branch')
-                             ->will($this->returnValue('cool-new-feature'));
-        $this->mockConsole->expects($this->once())
-                          ->method('writeLine')
-                          ->with($this->equalTo('Can not determine current series for branch cool-new-feature'));
-        $this->assertNull($this->nextSeriesVersionFinder->find($this->package, $this->mockRepository));
+        $this->repository->returns(['branch' => 'cool-new-feature']);
+        $this->assertNull($this->nextSeriesVersionFinder->find($this->package, $this->repository));
+        verify($this->console, 'writeLine')->received(
+                'Can not determine current series for branch cool-new-feature'
+        );
     }
 
     /**
@@ -74,20 +71,16 @@ class NextSeriesVersionFinderTestCase extends \PHPUnit_Framework_TestCase
      */
     public function returnsNoVersionIfUserDeniesFirstVersionInSeries()
     {
-        $this->mockRepository->expects($this->once())
-                             ->method('branch')
-                             ->will($this->returnValue('master'));
-        $this->mockRepository->expects(($this->once()))
-                             ->method('lastReleases')
-                             ->with($this->equalTo(new Series('1.0')), $this->equalTo(1))
-                             ->will($this->returnValue([]));
-        $this->mockConsole->expects($this->once())
-                          ->method('writeLine')
-                          ->with($this->equalTo('No release in series v1.0 yet, determined v1.0.0 as first version number.'));
-        $this->mockConsole->expects($this->once())
-                          ->method('confirm')
-                          ->will($this->returnValue(false));
-        $this->assertNull($this->nextSeriesVersionFinder->find($this->package, $this->mockRepository));
+        $this->repository->returns([
+                'branch'       => 'master',
+                'lastReleases' => []
+        ]);
+        $this->console->returns(['confirm' => false]);
+        $this->assertNull($this->nextSeriesVersionFinder->find($this->package, $this->repository));
+        verify($this->repository, 'lastReleases')->received(new Series('1.0'));
+        verify($this->console, 'writeLine')->received(
+                'No release in series v1.0 yet, determined v1.0.0 as first version number.'
+        );
     }
 
     /**
@@ -95,21 +88,16 @@ class NextSeriesVersionFinderTestCase extends \PHPUnit_Framework_TestCase
      */
     public function returnsFirstVersionInSeriesIfNoReleaseAvailableInThisSeries()
     {
-        $this->mockRepository->expects($this->once())
-                             ->method('branch')
-                             ->will($this->returnValue('master'));
-        $this->mockRepository->expects(($this->once()))
-                             ->method('lastReleases')
-                             ->with($this->equalTo(new Series('1.0')), $this->equalTo(1))
-                             ->will($this->returnValue([]));
-        $this->mockConsole->expects($this->once())
-                          ->method('writeLine')
-                          ->with($this->equalTo('No release in series v1.0 yet, determined v1.0.0 as first version number.'));
-        $this->mockConsole->expects($this->once())
-                          ->method('confirm')
-                          ->will($this->returnValue(true));
+        $this->repository->returns([
+                'branch'       => 'master',
+                'lastReleases' => []
+        ]);
+        $this->console->returns(['confirm' => true]);
         $this->assertEquals(new Version('v1.0.0'),
-                            $this->nextSeriesVersionFinder->find($this->package, $this->mockRepository)
+                            $this->nextSeriesVersionFinder->find($this->package, $this->repository)
+        );
+        verify($this->console, 'writeLine')->received(
+                'No release in series v1.0 yet, determined v1.0.0 as first version number.'
         );
     }
 
@@ -118,20 +106,15 @@ class NextSeriesVersionFinderTestCase extends \PHPUnit_Framework_TestCase
      */
     public function returnsNoVersionIfUserDeniesNextVersionInSeries()
     {
-        $this->mockRepository->expects($this->once())
-                             ->method('branch')
-                             ->will($this->returnValue('master'));
-        $this->mockRepository->expects(($this->once()))
-                             ->method('lastReleases')
-                             ->with($this->equalTo(new Series('1.0')), $this->equalTo(1))
-                             ->will($this->returnValue(['v1.0.1']));
-        $this->mockConsole->expects($this->once())
-                          ->method('writeLine')
-                          ->with($this->equalTo('Last release in series v1.0 was v1.0.1, determined v1.0.2 as next version number.'));
-        $this->mockConsole->expects($this->once())
-                          ->method('confirm')
-                          ->will($this->returnValue(false));
-        $this->assertNull($this->nextSeriesVersionFinder->find($this->package, $this->mockRepository));
+        $this->repository->returns([
+                'branch'       => 'master',
+                'lastReleases' => ['v1.0.1']
+        ]);
+        $this->console->returns(['confirm' => false]);
+        $this->assertNull($this->nextSeriesVersionFinder->find($this->package, $this->repository));
+        verify($this->console, 'writeLine')->received(
+                'Last release in series v1.0 was v1.0.1, determined v1.0.2 as next version number.'
+        );
     }
 
     /**
@@ -139,21 +122,16 @@ class NextSeriesVersionFinderTestCase extends \PHPUnit_Framework_TestCase
      */
     public function returnsNextVersionInSeriesIfReleasesAvailableInThisSeries()
     {
-        $this->mockRepository->expects($this->once())
-                             ->method('branch')
-                             ->will($this->returnValue('master'));
-        $this->mockRepository->expects(($this->once()))
-                             ->method('lastReleases')
-                             ->with($this->equalTo(new Series('1.0')), $this->equalTo(1))
-                             ->will($this->returnValue(['v1.0.1']));
-        $this->mockConsole->expects($this->once())
-                          ->method('writeLine')
-                          ->with($this->equalTo('Last release in series v1.0 was v1.0.1, determined v1.0.2 as next version number.'));
-        $this->mockConsole->expects($this->once())
-                          ->method('confirm')
-                          ->will($this->returnValue(true));
+        $this->repository->returns([
+                'branch'       => 'master',
+                'lastReleases' => ['v1.0.1']
+        ]);
+        $this->console->returns(['confirm' => true]);
         $this->assertEquals(new Version('v1.0.2'),
-                            $this->nextSeriesVersionFinder->find($this->package, $this->mockRepository)
+                            $this->nextSeriesVersionFinder->find($this->package, $this->repository)
+        );
+        verify($this->console, 'writeLine')->received(
+                'Last release in series v1.0 was v1.0.1, determined v1.0.2 as next version number.'
         );
     }
 }

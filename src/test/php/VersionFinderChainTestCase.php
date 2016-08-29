@@ -9,9 +9,11 @@ declare(strict_types=1);
  * @package  bovigo\releaseit
  */
 namespace bovigo\releaseit;
+use bovigo\callmap\NewInstance;
 use bovigo\releaseit\composer\Package;
 use bovigo\releaseit\repository\Repository;
 
+use function bovigo\callmap\verify;
 use function stubbles\reflect\annotationsOf;
 use function stubbles\reflect\annotationsOfConstructor;
 /**
@@ -26,19 +28,17 @@ class VersionFinderChainTestCase extends \PHPUnit_Framework_TestCase
      */
     private $package;
     /**
-     * mocked repository to create release from
-     *
-     * @type  \PHPUnit_Framework_MockObject_MockObject
+     * @type  Repository
      */
-    private $mockRepository;
+    private $repository;
 
     /**
      * set up test environment
      */
     public function setUp()
     {
-        $this->package        = new Package([]);
-        $this->mockRepository = $this->createMock(Repository::class);
+        $this->package    = new Package([]);
+        $this->repository = NewInstance::of(Repository::class);
     }
 
     /**
@@ -62,21 +62,24 @@ class VersionFinderChainTestCase extends \PHPUnit_Framework_TestCase
         );
     }
 
+    private function createVersionFinder($find = null): VersionFinder
+    {
+        return NewInstance::of(VersionFinder::class)->returns([
+                'find' => $find
+        ]);
+    }
+
     /**
      * @test
      */
     public function returnsNoVersionIfNoFinderReturnsOne()
     {
-        $mockVersionFinder1 = $this->createMock(VersionFinder::class);
-        $mockVersionFinder1->expects($this->once())
-                           ->method('find')
-                           ->will($this->returnValue(null));
-        $mockVersionFinder2 = $this->createMock(VersionFinder::class);
-        $mockVersionFinder2->expects($this->once())
-                           ->method('find')
-                           ->will($this->returnValue(null));
-        $versionFinderChain = new VersionFinderChain([$mockVersionFinder1, $mockVersionFinder2]);
-        $this->assertNull($versionFinderChain->find($this->package, $this->mockRepository));
+        $versionFinder1 = $this->createVersionFinder();
+        $versionFinder2 = $this->createVersionFinder();
+        $versionFinderChain = new VersionFinderChain([
+                $versionFinder1, $versionFinder2
+        ]);
+        $this->assertNull($versionFinderChain->find($this->package, $this->repository));
     }
 
     /**
@@ -85,18 +88,13 @@ class VersionFinderChainTestCase extends \PHPUnit_Framework_TestCase
     public function returnsVersionByFirstFinderWhichReturnsOne()
     {
         $version = new Version('1.0.1');
-        $mockVersionFinder1 = $this->createMock(VersionFinder::class);
-        $mockVersionFinder1->expects($this->once())
-                           ->method('find')
-                           ->will($this->returnValue(null));
-        $mockVersionFinder2 = $this->createMock(VersionFinder::class);
-        $mockVersionFinder2->expects($this->once())
-                           ->method('find')
-                           ->will($this->returnValue($version));
-        $mockVersionFinder3 = $this->createMock(VersionFinder::class);
-        $mockVersionFinder3->expects($this->never())
-                           ->method('find');
-        $versionFinderChain = new VersionFinderChain([$mockVersionFinder1, $mockVersionFinder2, $mockVersionFinder3]);
-        $this->assertEquals($version, $versionFinderChain->find($this->package, $this->mockRepository));
+        $versionFinder1 = $this->createVersionFinder();
+        $versionFinder2 = $this->createVersionFinder($version);
+        $versionFinder3 = $this->createVersionFinder();
+        $versionFinderChain = new VersionFinderChain([
+                $versionFinder1, $versionFinder2, $versionFinder3
+        ]);
+        $this->assertEquals($version, $versionFinderChain->find($this->package, $this->repository));
+        verify($versionFinder3, 'find')->wasNeverCalled();
     }
 }

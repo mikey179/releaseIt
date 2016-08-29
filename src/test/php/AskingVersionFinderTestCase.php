@@ -9,11 +9,13 @@ declare(strict_types=1);
  * @package  bovigo\releaseit
  */
 namespace bovigo\releaseit;
+use bovigo\callmap\NewInstance;
 use bovigo\releaseit\composer\Package;
 use bovigo\releaseit\repository\Repository;
 use stubbles\console\Console;
 use stubbles\input\ValueReader;
 
+use function bovigo\callmap\{verify, onConsecutiveCalls, throws};
 use function stubbles\reflect\annotationsPresentOnConstructor;
 /**
  * Test for bovigo\releaseit\AskingVersionFinder.
@@ -27,11 +29,9 @@ class AskingVersionFinderTestCase extends \PHPUnit_Framework_TestCase
      */
     private $askingVersionFinder;
     /**
-     * mocked console interface
-     *
-     * @type  \PHPUnit_Framework_MockObject_MockObject
+     * @type  Console
      */
-    private $mockConsole;
+    private $console;
     /**
      * package to create release for
      *
@@ -39,23 +39,19 @@ class AskingVersionFinderTestCase extends \PHPUnit_Framework_TestCase
      */
     private $package;
     /**
-     * mocked repository to create release from
-     *
-     * @type  \PHPUnit_Framework_MockObject_MockObject
+     * @type  Repository
      */
-    private $mockRepository;
+    private $repository;
 
     /**
      * set up test environment
      */
     public function setUp()
     {
-        $this->mockConsole         = $this->getMockBuilder(Console::class)
-                                          ->disableOriginalConstructor()
-                                          ->getMock();
-        $this->askingVersionFinder = new AskingVersionFinder($this->mockConsole);
+        $this->console             = NewInstance::stub(Console::class);
+        $this->askingVersionFinder = new AskingVersionFinder($this->console);
         $this->package             = new Package([]);
-        $this->mockRepository      = $this->createMock(Repository::class);
+        $this->repository          = NewInstance::of(Repository::class);
     }
 
     /**
@@ -63,21 +59,13 @@ class AskingVersionFinderTestCase extends \PHPUnit_Framework_TestCase
      */
     public function writesLastReleasesToConsole()
     {
-        $this->mockRepository->expects($this->once())
-                             ->method('lastReleases')
-                             ->will($this->returnValue(['v1.0.0', 'v1.0.1']));
-        $this->mockConsole->expects($this->at(1))
-                          ->method('writeLine')
-                          ->with($this->equalTo('v1.0.0'));
-        $this->mockConsole->expects($this->at(2))
-                          ->method('writeLine')
-                          ->with($this->equalTo('v1.0.1'));
-        $this->mockConsole->expects($this->at(4))
-                          ->method('prompt')
-                          ->will($this->returnValue(ValueReader::forValue('v1.1.0')));
+        $this->repository->returns(['lastReleases' => ['v1.0.0', 'v1.0.1']]);
+        $this->console->returns(['prompt' => ValueReader::forValue('v1.1.0')]);
         $this->assertEquals(new Version('v1.1.0'),
-                            $this->askingVersionFinder->find($this->package, $this->mockRepository)
+                            $this->askingVersionFinder->find($this->package, $this->repository)
         );
+        verify($this->console, 'writeLine')->receivedOn(2, 'v1.0.0');
+        verify($this->console, 'writeLine')->receivedOn(3, 'v1.0.1');
     }
 
     /**
@@ -85,17 +73,13 @@ class AskingVersionFinderTestCase extends \PHPUnit_Framework_TestCase
      */
     public function repromptsUntilValidVersionNumberEntered()
     {
-        $this->mockRepository->expects($this->once())
-                             ->method('lastReleases')
-                             ->will($this->returnValue([]));
-        $this->mockConsole->expects($this->exactly(2))
-                          ->method('prompt')
-                          ->will($this->onConsecutiveCalls(ValueReader::forValue('foo'),
-                                                           ValueReader::forValue('v1.1.0')
-                                 )
-                            );
+        $this->repository->returns(['lastReleases' => []]);
+        $this->console->returns(['prompt' => onConsecutiveCalls(
+                ValueReader::forValue('foo'),
+                ValueReader::forValue('v1.1.0')
+        )]);
         $this->assertEquals(new Version('v1.1.0'),
-                            $this->askingVersionFinder->find($this->package, $this->mockRepository)
+                            $this->askingVersionFinder->find($this->package, $this->repository)
         );
     }
 }

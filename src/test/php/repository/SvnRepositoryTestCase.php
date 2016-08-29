@@ -9,9 +9,13 @@ declare(strict_types=1);
  * @package  bovigo\releaseit
  */
 namespace bovigo\releaseit\repository;
-use bovigo\releaseit\Series;
-use bovigo\releaseit\Version;
+use bovigo\callmap\NewInstance;
+use bovigo\releaseit\{Series, Version};
 use org\bovigo\vfs\vfsStream;
+use stubbles\console\Executor;
+use stubbles\streams\InputStream;
+
+use function bovigo\callmap\{verify, throws};
 /**
  * Test for bovigo\releaseit\repository\SvnRepository.
  */
@@ -24,11 +28,9 @@ class SvnRepositoryTestCase extends \PHPUnit_Framework_TestCase
      */
     private $svnRepository;
     /**
-     * mocked command executor
-     *
-     * @type  \PHPUnit_Framework_MockObject_MockObject
+     * @type  Executor
      */
-    private $mockExecutor;
+    private $executor;
     /**
      * root path
      *
@@ -41,11 +43,10 @@ class SvnRepositoryTestCase extends \PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
-        $this->mockExecutor  = $this->createPartialMock('stubbles\console\Executor', ['outputOf', 'executeAsync']);
-        $this->mockExecutor->expects($this->at(0))
-                           ->method('outputOf')
-                           ->will($this->returnValue(['URL: http://svn.example.org/svn/foo/trunk']));
-        $this->svnRepository = new SvnRepository($this->mockExecutor);
+        $this->executor = NewInstance::of(Executor::class)->returns([
+                'outputOf' => ['URL: http://svn.example.org/svn/foo/trunk']
+        ]);
+        $this->svnRepository = new SvnRepository($this->executor);
         $this->root          = vfsStream::setup();
     }
 
@@ -56,11 +57,10 @@ class SvnRepositoryTestCase extends \PHPUnit_Framework_TestCase
      */
     public function createInstanceThrowsRepositoryErrorWhenSvnInfoFails()
     {
-        $mockExecutor  = $this->createMock('stubbles\console\Executor');
-        $mockExecutor->expects($this->once())
-                     ->method('execute')
-                     ->will($this->throwException(new \RuntimeException('error')));
-        new SvnRepository($mockExecutor);
+        $executor = NewInstance::of(Executor::class)->returns([
+                'execute' => throws(new \RuntimeException('error'))
+        ]);
+        new SvnRepository($executor);
     }
 
     /**
@@ -70,11 +70,10 @@ class SvnRepositoryTestCase extends \PHPUnit_Framework_TestCase
      */
     public function createInstanceThrowsRepositoryErrorWhenSvnInfoDoesNotContainSvnUrl()
     {
-        $mockExecutor  = $this->createPartialMock('stubbles\console\Executor', ['outputOf', 'executeAsync']);
-        $mockExecutor->expects($this->once())
-                     ->method('outputOf')
-                     ->will($this->returnValue([]));
-        new SvnRepository($mockExecutor);
+        $executor = NewInstance::of(Executor::class)->returns([
+                'outputOf' => []
+        ]);
+        new SvnRepository($executor);
     }
 
     /**
@@ -84,11 +83,10 @@ class SvnRepositoryTestCase extends \PHPUnit_Framework_TestCase
      */
     public function createInstanceThrowsRepositoryErrorWhenTagUrlCanNotBeDerivedFromSvnUrl()
     {
-        $mockExecutor  = $this->createPartialMock('stubbles\console\Executor', ['outputOf', 'executeAsync']);
-        $mockExecutor->expects($this->once())
-                     ->method('outputOf')
-                     ->will($this->returnValue(['URL: http://svn.example.org/svn/foo']));
-        new SvnRepository($mockExecutor);
+        $executor = NewInstance::of(Executor::class)->returns([
+                'outputOf' => ['URL: http://svn.example.org/svn/foo']
+        ]);
+        new SvnRepository($executor);
     }
 
     /**
@@ -96,12 +94,11 @@ class SvnRepositoryTestCase extends \PHPUnit_Framework_TestCase
      */
     public function canCreateInstanceFromBranch()
     {
-        $mockExecutor  = $this->createPartialMock('stubbles\console\Executor', ['outputOf', 'executeAsync']);
-        $mockExecutor->expects($this->once())
-                     ->method('outputOf')
-                     ->will($this->returnValue(['URL: http://svn.example.org/svn/foo/branches/v1.1.x']));
+        $executor = NewInstance::of(Executor::class)->returns([
+                'outputOf' => ['URL: http://svn.example.org/svn/foo/branches/v1.1.x']
+        ]);
         $this->assertInstanceOf(SvnRepository::class,
-                                new SvnRepository($mockExecutor)
+                                new SvnRepository($executor)
         );
     }
 
@@ -112,9 +109,9 @@ class SvnRepositoryTestCase extends \PHPUnit_Framework_TestCase
      */
     public function isDirtyThrowsRepositoryErrorWhenSvnStatusFails()
     {
-        $this->mockExecutor->expects($this->once())
-                           ->method('outputOf')
-                           ->will($this->throwException(new \RuntimeException('error')));
+        $this->executor->returns([
+                    'outputOf' => throws(new \RuntimeException('error'))
+        ]);
         $this->svnRepository->isDirty();
     }
 
@@ -123,9 +120,9 @@ class SvnRepositoryTestCase extends \PHPUnit_Framework_TestCase
      */
     public function isDirtyReturnsTrueWhenCheckoutContainsUncomittedChanges()
     {
-        $this->mockExecutor->expects($this->once())
-                           ->method('outputOf')
-                           ->will($this->returnValue(['A  readme.md']));
+        $this->executor->returns([
+                    'outputOf' => ['A  readme.md']
+        ]);
         $this->assertTrue($this->svnRepository->isDirty());
     }
 
@@ -134,9 +131,9 @@ class SvnRepositoryTestCase extends \PHPUnit_Framework_TestCase
      */
     public function isDirtyReturnsFalseWhenCheckoutContainsNoUncomittedChanges()
     {
-        $this->mockExecutor->expects($this->once())
-                           ->method('outputOf')
-                           ->will($this->returnValue([]));
+        $this->executor->returns([
+                    'outputOf' => []
+        ]);
         $this->assertFalse($this->svnRepository->isDirty());
     }
 
@@ -145,11 +142,11 @@ class SvnRepositoryTestCase extends \PHPUnit_Framework_TestCase
      */
     public function readStatusReturnsInputStreamToReadResultFrom()
     {
-        $mockInputStream = $this->createMock('stubbles\streams\InputStream');
-        $this->mockExecutor->expects($this->once())
-                           ->method('executeAsync')
-                           ->will(($this->returnValue($mockInputStream)));
-        $this->assertSame($mockInputStream,
+        $inputStream = NewInstance::of(InputStream::class);
+        $this->executor->returns([
+                    'executeAsync' => $inputStream
+        ]);
+        $this->assertSame($inputStream,
                           $this->svnRepository->readStatus()
         );
     }
@@ -169,11 +166,10 @@ class SvnRepositoryTestCase extends \PHPUnit_Framework_TestCase
      */
     public function branchReturnsBranchNameWhenWorkspaceIsBranchCheckout()
     {
-        $mockExecutor  = $this->createPartialMock('stubbles\console\Executor', ['outputOf', 'executeAsync']);
-        $mockExecutor->expects($this->once())
-                     ->method('outputOf')
-                     ->will($this->returnValue(['URL: http://svn.example.org/svn/foo/branches/cool-new-feature']));
-        $svnRepository = new SvnRepository($mockExecutor);
+        $executor = NewInstance::of(Executor::class)->returns([
+                'outputOf' => ['URL: http://svn.example.org/svn/foo/branches/cool-new-feature']
+        ]);
+        $svnRepository = new SvnRepository($executor);
         $this->assertEquals('cool-new-feature',
                             $svnRepository->branch()
         );
@@ -186,11 +182,25 @@ class SvnRepositoryTestCase extends \PHPUnit_Framework_TestCase
      */
     public function lastReleasesThrowsRepositoryErrorWhenSvnListFails()
     {
-        $this->mockExecutor->expects($this->once())
-                           ->method('outputOf')
-                           ->with($this->equalTo('svn list http://svn.example.org/svn/foo/tags | grep "v" | sort -r | head -5'))
-                           ->will($this->throwException(new \RuntimeException('error')));
+        $this->executor->returns([
+                    'outputOf' => throws(new \RuntimeException('error'))
+        ]);
         $this->svnRepository->lastReleases();
+    }
+
+    /**
+     * @test
+     */
+    public function lastReleasesGrepsForTagsStartingWithVWhenNoSeriesGiven()
+    {
+        $this->executor->returns([
+                    'outputOf' => ['v1.0.0/', 'v1.0.1/']
+        ]);
+        $this->svnRepository->lastReleases();
+        verify($this->executor, 'execute')->receivedOn(
+                2,
+                'svn list http://svn.example.org/svn/foo/tags | grep "v" | sort -r | head -5'
+        );
     }
 
     /**
@@ -198,12 +208,26 @@ class SvnRepositoryTestCase extends \PHPUnit_Framework_TestCase
      */
     public function lastReleasesReturnsListOfLastReleases()
     {
-        $this->mockExecutor->expects($this->once())
-                           ->method('outputOf')
-                           ->with($this->equalTo('svn list http://svn.example.org/svn/foo/tags | grep "v1.0" | sort -r | head -2'))
-                           ->will(($this->returnValue(['v1.0.0/', 'v1.0.1/'])));
+        $this->executor->returns([
+                    'outputOf' => ['v1.0.0/', 'v1.0.1/']
+        ]);
         $this->assertEquals(['v1.0.0', 'v1.0.1'],
                             $this->svnRepository->lastReleases(new Series('1.0'), 2)
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function lastReleasesGrepsForTagsStartingWithGivenSeries()
+    {
+        $this->executor->returns([
+                    'outputOf' => ['v1.0.0/', 'v1.0.1/']
+        ]);
+        $this->svnRepository->lastReleases(new Series('1.0'), 2);
+        verify($this->executor, 'execute')->receivedOn(
+                2,
+                'svn list http://svn.example.org/svn/foo/tags | grep "v1.0" | sort -r | head -2'
         );
     }
 
@@ -214,9 +238,9 @@ class SvnRepositoryTestCase extends \PHPUnit_Framework_TestCase
      */
     public function createReleaseThrowsRepositoryErrorWhenSvnCpFails()
     {
-        $this->mockExecutor->expects($this->once())
-                           ->method('outputOf')
-                           ->will($this->throwException(new \RuntimeException('error')));
+        $this->executor->returns([
+                    'outputOf' => throws(new \RuntimeException('error'))
+        ]);
         $this->svnRepository->createRelease(new Version('1.1.0'));
     }
 
@@ -226,12 +250,15 @@ class SvnRepositoryTestCase extends \PHPUnit_Framework_TestCase
     public function createReleaseReturnsOutputFromCreatingTag()
     {
         $svnCpOutput = ['Committed revision 303.'];
-        $this->mockExecutor->expects($this->once())
-                           ->method('outputOf')
-                           ->with($this->equalTo('svn cp . http://svn.example.org/svn/foo/tags/v1.1.0 -m "tag release v1.1.0"'))
-                           ->will(($this->returnValue($svnCpOutput)));
+        $this->executor->returns([
+                    'outputOf' => $svnCpOutput
+        ]);
         $this->assertEquals($svnCpOutput,
                             $this->svnRepository->createRelease(new Version('1.1.0'))
+        );
+        verify($this->executor, 'outputOf')->receivedOn(
+                2,
+                'svn cp . http://svn.example.org/svn/foo/tags/v1.1.0 -m "tag release v1.1.0"'
         );
     }
 }

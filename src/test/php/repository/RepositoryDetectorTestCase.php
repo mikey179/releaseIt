@@ -9,7 +9,9 @@ declare(strict_types=1);
  * @package  bovigo\releaseit
  */
 namespace bovigo\releaseit\repository;
+use bovigo\callmap\NewInstance;
 use org\bovigo\vfs\vfsStream;
+use stubbles\console\Executor;
 /**
  * Test for bovigo\releaseit\repository\RepositoryDetector.
  */
@@ -22,11 +24,9 @@ class RepositoryDetectorTestCase extends \PHPUnit_Framework_TestCase
      */
     private $repositoryDetector;
     /**
-     * mocked command executor
-     *
-     * @type  \PHPUnit_Framework_MockObject_MockObject
+     * @type  Executor
      */
-    private $mockExecutor;
+    private $executor;
     /**
      * root path
      *
@@ -39,8 +39,8 @@ class RepositoryDetectorTestCase extends \PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
-        $this->mockExecutor       = $this->createPartialMock('stubbles\console\Executor', ['outputOf', 'executeAsync']);
-        $this->repositoryDetector = new RepositoryDetector($this->mockExecutor);
+        $this->executor           = NewInstance::of(Executor::class);
+        $this->repositoryDetector = new RepositoryDetector($this->executor);
         $this->root               = vfsStream::setup();
     }
 
@@ -60,9 +60,9 @@ class RepositoryDetectorTestCase extends \PHPUnit_Framework_TestCase
     public function svnFolderResultsInSvnRepository()
     {
         vfsStream::newDirectory('.svn')->at($this->root);
-        $this->mockExecutor->expects($this->once())
-                           ->method('outputOf')
-                           ->will($this->returnValue(['URL: http://svn.example.org/svn/foo/trunk']));
+        $this->executor->returns([
+                    'outputOf' => ['URL: http://svn.example.org/svn/foo/trunk']
+        ]);
         $this->assertInstanceOf(SvnRepository::class,
                                $this->repositoryDetector->detect($this->root->url())
         );

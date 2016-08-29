@@ -9,9 +9,13 @@ declare(strict_types=1);
  * @package  bovigo\releaseit
  */
 namespace bovigo\releaseit\repository;
-use bovigo\releaseit\Series;
-use bovigo\releaseit\Version;
+use bovigo\callmap\NewInstance;
+use bovigo\releaseit\{Series, Version};
 use org\bovigo\vfs\vfsStream;
+use stubbles\console\Executor;
+use stubbles\streams\InputStream;
+
+use function bovigo\callmap\{verify, throws};
 /**
  * Test for bovigo\releaseit\repository\GitRepository.
  */
@@ -24,11 +28,9 @@ class GitRepositoryTestCase extends \PHPUnit_Framework_TestCase
      */
     private $gitRepository;
     /**
-     * mocked command executor
-     *
-     * @type  \PHPUnit_Framework_MockObject_MockObject
+     * @type  Executor
      */
-    private $mockExecutor;
+    private $executor;
     /**
      * root path
      *
@@ -41,8 +43,8 @@ class GitRepositoryTestCase extends \PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
-        $this->mockExecutor  = $this->createPartialMock('stubbles\console\Executor', ['outputOf', 'executeAsync']);
-        $this->gitRepository = new GitRepository($this->mockExecutor);
+        $this->executor      = NewInstance::of(Executor::class);
+        $this->gitRepository = new GitRepository($this->executor);
         $this->root          = vfsStream::setup();
     }
 
@@ -53,9 +55,9 @@ class GitRepositoryTestCase extends \PHPUnit_Framework_TestCase
      */
     public function isDirtyThrowsRepositoryErrorWhenGitStatusFails()
     {
-        $this->mockExecutor->expects($this->once())
-                           ->method('outputOf')
-                           ->will($this->throwException(new \RuntimeException('error')));
+        $this->executor->returns([
+                    'outputOf' => throws(new \RuntimeException('error'))
+        ]);
         $this->gitRepository->isDirty();
     }
 
@@ -66,9 +68,9 @@ class GitRepositoryTestCase extends \PHPUnit_Framework_TestCase
      */
     public function isDirtyThrowsRepositoryErrorWhenCurrentFolderIsNoGitRepository()
     {
-        $this->mockExecutor->expects($this->once())
-                           ->method('outputOf')
-                           ->will($this->returnValue([]));
+        $this->executor->returns([
+                    'outputOf' => []
+        ]);
         $this->gitRepository->isDirty();
     }
 
@@ -77,9 +79,9 @@ class GitRepositoryTestCase extends \PHPUnit_Framework_TestCase
      */
     public function isDirtyReturnsTrueWhenRepositoryContainsUncomittedChanges()
     {
-        $this->mockExecutor->expects($this->once())
-                           ->method('outputOf')
-                           ->will($this->returnValue(['# Changes to be committed:']));
+        $this->executor->returns([
+                    'outputOf' => ['# Changes to be committed:']
+        ]);
         $this->assertTrue($this->gitRepository->isDirty());
     }
 
@@ -88,9 +90,9 @@ class GitRepositoryTestCase extends \PHPUnit_Framework_TestCase
      */
     public function isDirtyReturnsFalseWhenRepositoryIsClean()
     {
-        $this->mockExecutor->expects($this->once())
-                           ->method('outputOf')
-                           ->will($this->returnValue(['nothing to commit, working directory clean']));
+        $this->executor->returns([
+                    'outputOf' => ['nothing to commit, working directory clean']
+        ]);
         $this->assertFalse($this->gitRepository->isDirty());
     }
 
@@ -99,11 +101,11 @@ class GitRepositoryTestCase extends \PHPUnit_Framework_TestCase
      */
     public function readStatusReturnsInputStreamToReadResultFrom()
     {
-        $mockInputStream = $this->createMock('stubbles\streams\InputStream');
-        $this->mockExecutor->expects($this->once())
-                           ->method('executeAsync')
-                           ->will(($this->returnValue($mockInputStream)));
-        $this->assertSame($mockInputStream,
+        $inputStream = NewInstance::of(InputStream::class);
+        $this->executor->returns([
+                    'executeAsync' => $inputStream
+        ]);
+        $this->assertSame($inputStream,
                           $this->gitRepository->readStatus()
         );
     }
@@ -115,9 +117,9 @@ class GitRepositoryTestCase extends \PHPUnit_Framework_TestCase
      */
     public function branchThrowsRepositoryErrorWhenGitBranchFails()
     {
-        $this->mockExecutor->expects($this->once())
-                           ->method('outputOf')
-                           ->will($this->throwException(new \RuntimeException('error')));
+        $this->executor->returns([
+                    'outputOf' => throws(new \RuntimeException('error'))
+        ]);
         $this->gitRepository->branch();
     }
 
@@ -128,9 +130,9 @@ class GitRepositoryTestCase extends \PHPUnit_Framework_TestCase
      */
     public function branchThrowsRepositoryErrorWhenGitBranchReturnsNoOutput()
     {
-        $this->mockExecutor->expects($this->once())
-                           ->method('outputOf')
-                           ->will(($this->returnValue([])));
+        $this->executor->returns([
+                    'outputOf' => []
+        ]);
         $this->gitRepository->branch();
     }
 
@@ -139,9 +141,9 @@ class GitRepositoryTestCase extends \PHPUnit_Framework_TestCase
      */
     public function branchReturnsCurrentBranchName()
     {
-        $this->mockExecutor->expects($this->once())
-                           ->method('outputOf')
-                           ->will(($this->returnValue(['* master'])));
+        $this->executor->returns([
+                    'outputOf' => ['* master']
+        ]);
         $this->assertEquals('master',
                             $this->gitRepository->branch()
         );
@@ -154,11 +156,24 @@ class GitRepositoryTestCase extends \PHPUnit_Framework_TestCase
      */
     public function lastReleasesThrowsRepositoryErrorWhenGitTagFails()
     {
-        $this->mockExecutor->expects($this->once())
-                           ->method('outputOf')
-                           ->with($this->equalTo('git tag -l | grep "v" | sort -r | head -5'))
-                           ->will($this->throwException(new \RuntimeException('error')));
+        $this->executor->returns([
+                    'outputOf' => throws(new \RuntimeException('error'))
+        ]);
         $this->gitRepository->lastReleases();
+    }
+
+    /**
+     * @test
+     */
+    public function lastReleasesGrepsForTagsStartingWithVWhenNoSeriesGiven()
+    {
+        $this->executor->returns([
+                    'outputOf' => ['v1.0.0', 'v1.0.1']
+        ]);
+        $this->gitRepository->lastReleases();
+        verify($this->executor, 'execute')->received(
+                'git tag -l | grep "v" | sort -r | head -5'
+        );
     }
 
     /**
@@ -166,12 +181,25 @@ class GitRepositoryTestCase extends \PHPUnit_Framework_TestCase
      */
     public function lastReleasesReturnsListOfLastReleases()
     {
-        $this->mockExecutor->expects($this->once())
-                           ->method('outputOf')
-                           ->with($this->equalTo('git tag -l | grep "v1.0" | sort -r | head -2'))
-                           ->will(($this->returnValue(['v1.0.0', 'v1.0.1'])));
+        $this->executor->returns([
+                    'outputOf' => ['v1.0.0', 'v1.0.1']
+        ]);
         $this->assertEquals(['v1.0.0', 'v1.0.1'],
                             $this->gitRepository->lastReleases(new Series('1.0'), 2)
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function lastReleasesGrepsForTagsStartingWithGivenSeries()
+    {
+        $this->executor->returns([
+                    'outputOf' => ['v1.0.0', 'v1.0.1']
+        ]);
+        $this->gitRepository->lastReleases(new Series('1.0'), 2);
+        verify($this->executor, 'execute')->received(
+                'git tag -l | grep "v1.0" | sort -r | head -2'
         );
     }
 
@@ -182,9 +210,9 @@ class GitRepositoryTestCase extends \PHPUnit_Framework_TestCase
      */
     public function createReleaseThrowsRepositoryErrorWhenGitTagFails()
     {
-        $this->mockExecutor->expects($this->once())
-                           ->method('outputOf')
-                           ->will($this->throwException(new \RuntimeException('error')));
+        $this->executor->returns([
+                    'outputOf' => throws(new \RuntimeException('error'))
+        ]);
         $this->gitRepository->createRelease(new Version('1.1.0'));
     }
 
@@ -200,9 +228,9 @@ class GitRepositoryTestCase extends \PHPUnit_Framework_TestCase
                 'To git@github.com:example/foo.git',
                 ' * [new tag]         v1.1.0 -> v1.1.0'
         ];
-        $this->mockExecutor->expects($this->once())
-                           ->method('outputOf')
-                           ->will(($this->returnValue($gitTagOutput)));
+        $this->executor->returns([
+                    'outputOf' => $gitTagOutput
+        ]);
         $this->assertEquals($gitTagOutput,
                             $this->gitRepository->createRelease(new Version('1.1.0'))
         );
