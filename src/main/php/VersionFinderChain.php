@@ -5,11 +5,11 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
- * @package  org\bovigo\releaseit
+ * @package  bovigo\releaseit
  */
-namespace org\bovigo\releaseit;
-use org\bovigo\releaseit\composer\Package;
-use org\bovigo\releaseit\repository\Repository;
+namespace bovigo\releaseit;
+use bovigo\releaseit\composer\Package;
+use bovigo\releaseit\repository\Repository;
 /**
  * Finds version by asking a list of version finders.
  *
@@ -28,7 +28,7 @@ class VersionFinderChain implements VersionFinder
      * constructor
      *
      * @param  VersionFinder[]  $finders
-     * @List(org\bovigo\releaseit\VersionFinder.class)
+     * @List(bovigo\releaseit\VersionFinder.class)
      */
     public function __construct(array $finders)
     {

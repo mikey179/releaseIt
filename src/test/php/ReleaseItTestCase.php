@@ -5,15 +5,18 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
- * @package  org\bovigo\releaseit
+ * @package  bovigo\releaseit
  */
-namespace org\bovigo\releaseit;
+namespace bovigo\releaseit;
+use bovigo\releaseit\repository\Repository;
+use bovigo\releaseit\repository\RepositoryDetector;
+use stubbles\console\Console;
 use stubbles\input\ValueReader;
 use org\bovigo\vfs\vfsStream;
 
 use function stubbles\reflect\annotationsOf;
 /**
- * Test for org\bovigo\releaseit\ReleaseIt.
+ * Test for bovigo\releaseit\ReleaseIt.
  */
 class ReleaseItTestCase extends \PHPUnit_Framework_TestCase
 {
@@ -47,13 +50,13 @@ class ReleaseItTestCase extends \PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
-        $this->mockConsole       = $this->getMockBuilder('stubbles\console\Console')
+        $this->mockConsole       = $this->getMockBuilder(Console::class)
                                         ->disableOriginalConstructor()
                                         ->getMock();
-        $this->mockRepoDetector  = $this->getMockBuilder('org\bovigo\releaseit\repository\RepositoryDetector')
+        $this->mockRepoDetector  = $this->getMockBuilder(RepositoryDetector::class)
                                         ->disableOriginalConstructor()
                                         ->getMock();
-        $this->mockVersionFinder = $this->createMock('org\bovigo\releaseit\VersionFinder');
+        $this->mockVersionFinder = $this->createMock(VersionFinder::class);
         $root                    = vfsStream::setup();
         vfsStream::newFile('composer.json')->withContent('{}')->at($root);
         $this->releaseIt        = new ReleaseIt($this->mockConsole,
@@ -95,7 +98,7 @@ class ReleaseItTestCase extends \PHPUnit_Framework_TestCase
      */
     private function createMockRepository()
     {
-        $mockRepository = $this->createMock('org\bovigo\releaseit\repository\Repository');
+        $mockRepository = $this->createMock(Repository::class);
         $this->mockRepoDetector->expects(($this->once()))
                                ->method('detect')
                                ->will($this->returnValue($mockRepository));
@@ -179,7 +182,7 @@ class ReleaseItTestCase extends \PHPUnit_Framework_TestCase
      */
     public function canCreateInstance()
     {
-        $this->assertInstanceOf('org\bovigo\releaseit\ReleaseIt',
+        $this->assertInstanceOf(ReleaseIt::class,
                                 ReleaseIt::create(new \stubbles\values\Rootpath())
         );
     }

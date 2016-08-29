@@ -5,12 +5,12 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
- * @package  org\bovigo\releaseit
+ * @package  bovigo\releaseit
  */
-namespace org\bovigo\releaseit;
+namespace bovigo\releaseit;
+use bovigo\releaseit\composer\Package;
+use bovigo\releaseit\repository\Repository;
 use stubbles\console\Console;
-use org\bovigo\releaseit\composer\Package;
-use org\bovigo\releaseit\repository\Repository;
 /**
  * Finds version for release to create by comparing repository branch with
  * package branch alias definitions.

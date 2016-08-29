@@ -5,19 +5,19 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
- * @package  org\bovigo\releaseit
+ * @package  bovigo\releaseit
  */
-namespace org\bovigo\releaseit\composer;
-use org\bovigo\releaseit\Series;
+namespace bovigo\releaseit\composer;
+use bovigo\releaseit\Series;
 use org\bovigo\vfs\vfsStream;
 /**
- * Test for org\bovigo\releaseit\composer\Package.
+ * Test for bovigo\releaseit\composer\Package.
  */
 class PackageTestCase extends \PHPUnit_Framework_TestCase
 {
     /**
      * @test
-     * @expectedException  org\bovigo\releaseit\composer\InvalidPackage
+     * @expectedException  bovigo\releaseit\composer\InvalidPackage
      */
     public function createFromNonExistingFileThrowsInvalidPackage()
     {
@@ -26,7 +26,7 @@ class PackageTestCase extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
-     * @expectedException  org\bovigo\releaseit\composer\InvalidPackage
+     * @expectedException  bovigo\releaseit\composer\InvalidPackage
      */
     public function createFromInvalidJsonFileThrowsInvalidPackage()
     {

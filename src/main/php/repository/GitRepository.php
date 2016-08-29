@@ -5,11 +5,11 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
- * @package  org\bovigo\releaseit
+ * @package  bovigo\releaseit
  */
-namespace org\bovigo\releaseit\repository;
+namespace bovigo\releaseit\repository;
 use stubbles\console\Executor;
-use org\bovigo\releaseit\Version;
+use bovigo\releaseit\Version;
 
 use function stubbles\console\collect;
 /**

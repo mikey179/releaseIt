@@ -16,7 +16,7 @@
     },
     "autoload": {
         "psr-4": {
-            "org\\bovigo\\releaseit\\": "src/main/php"
+            "bovigo\\releaseit\\": "src/main/php"
         }
     },
     "bin": ["bin/releaseIt"],

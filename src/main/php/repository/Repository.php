@@ -5,10 +5,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
- * @package  org\bovigo\releaseit
+ * @package  bovigo\releaseit
  */
-namespace org\bovigo\releaseit\repository;
-use org\bovigo\releaseit\Version;
+namespace bovigo\releaseit\repository;
+use bovigo\releaseit\Version;
 /**
  * Provides access to a repository.
  */

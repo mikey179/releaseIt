@@ -5,14 +5,14 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
- * @package  org\bovigo\releaseit
+ * @package  bovigo\releaseit
  */
-namespace org\bovigo\releaseit\repository;
-use org\bovigo\releaseit\Series;
-use org\bovigo\releaseit\Version;
+namespace bovigo\releaseit\repository;
+use bovigo\releaseit\Series;
+use bovigo\releaseit\Version;
 use org\bovigo\vfs\vfsStream;
 /**
- * Test for org\bovigo\releaseit\repository\SvnRepository.
+ * Test for bovigo\releaseit\repository\SvnRepository.
  */
 class SvnRepositoryTestCase extends \PHPUnit_Framework_TestCase
 {
@@ -50,7 +50,7 @@ class SvnRepositoryTestCase extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
-     * @expectedException  org\bovigo\releaseit\repository\RepositoryError
+     * @expectedException  bovigo\releaseit\repository\RepositoryError
      * @expectedExceptionMessage   Failure while checking svn info
      */
     public function createInstanceThrowsRepositoryErrorWhenSvnInfoFails()
@@ -64,7 +64,7 @@ class SvnRepositoryTestCase extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
-     * @expectedException  org\bovigo\releaseit\repository\RepositoryError
+     * @expectedException  bovigo\releaseit\repository\RepositoryError
      * @expectedExceptionMessage   Could not retrieve svn tag url, can not create release for this svn repository
      */
     public function createInstanceThrowsRepositoryErrorWhenSvnInfoDoesNotContainSvnUrl()
@@ -78,7 +78,7 @@ class SvnRepositoryTestCase extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
-     * @expectedException  org\bovigo\releaseit\repository\RepositoryError
+     * @expectedException  bovigo\releaseit\repository\RepositoryError
      * @expectedExceptionMessage   Can not extract tag url from current svn checkout url http://svn.example.org/svn/foo
      */
     public function createInstanceThrowsRepositoryErrorWhenTagUrlCanNotBeDerivedFromSvnUrl()
@@ -99,14 +99,14 @@ class SvnRepositoryTestCase extends \PHPUnit_Framework_TestCase
         $mockExecutor->expects($this->once())
                      ->method('outputOf')
                      ->will($this->returnValue(array('URL: http://svn.example.org/svn/foo/branches/v1.1.x')));
-        $this->assertInstanceOf('org\bovigo\releaseit\repository\SvnRepository',
+        $this->assertInstanceOf(SvnRepository::class,
                                 new SvnRepository($mockExecutor)
         );
     }
 
     /**
      * @test
-     * @expectedException  org\bovigo\releaseit\repository\RepositoryError
+     * @expectedException  bovigo\releaseit\repository\RepositoryError
      * @expectedExceptionMessage   Failure while checking svn status
      */
     public function isDirtyThrowsRepositoryErrorWhenSvnStatusFails()
@@ -180,7 +180,7 @@ class SvnRepositoryTestCase extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
-     * @expectedException  org\bovigo\releaseit\repository\RepositoryError
+     * @expectedException  bovigo\releaseit\repository\RepositoryError
      * @expectedExceptionMessage   Failure while retrieving last releases
      */
     public function getLastReleasesThrowsRepositoryErrorWhenSvnListFails()
@@ -208,7 +208,7 @@ class SvnRepositoryTestCase extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
-     * @expectedException  org\bovigo\releaseit\repository\RepositoryError
+     * @expectedException  bovigo\releaseit\repository\RepositoryError
      * @expectedExceptionMessage   Failure while creating release
      */
     public function createReleaseThrowsRepositoryErrorWhenSvnCpFails()

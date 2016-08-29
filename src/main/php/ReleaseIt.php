@@ -5,16 +5,13 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
- * @package  org\bovigo\releaseit
+ * @package  bovigo\releaseit
  */
-namespace org\bovigo\releaseit;
-use stubbles\console\Console;
-use stubbles\console\ConsoleApp;
+namespace bovigo\releaseit;
+use bovigo\releaseit\composer\{InvalidPackage, Package};
+use bovigo\releaseit\repository\{Repository, RepositoryDetector};
+use stubbles\console\{Console, ConsoleApp};
 use stubbles\ioc\Binder;
-use org\bovigo\releaseit\composer\Package;
-use org\bovigo\releaseit\composer\InvalidPackage;
-use org\bovigo\releaseit\repository\Repository;
-use org\bovigo\releaseit\repository\RepositoryDetector;
 /**
  * Console app to create composer package releases directly from within a checkout.
  *
@@ -59,9 +56,9 @@ class ReleaseIt extends ConsoleApp
                 self::currentWorkingDirectory(),
                 function(Binder $binder)
                 {
-                    $binder->bindList('org\bovigo\releaseit\VersionFinder')
-                            ->withValue('org\bovigo\releaseit\NextSeriesVersionFinder')
-                            ->withValue('org\bovigo\releaseit\AskingVersionFinder');
+                    $binder->bindList(VersionFinder::class)
+                            ->withValue(NextSeriesVersionFinder::class)
+                            ->withValue(AskingVersionFinder::class);
                 }
         ];
     }

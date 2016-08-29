@@ -5,15 +5,17 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
- * @package  org\bovigo\releaseit
+ * @package  bovigo\releaseit
  */
-namespace org\bovigo\releaseit;
+namespace bovigo\releaseit;
+use bovigo\releaseit\composer\Package;
+use bovigo\releaseit\repository\Repository;
+use stubbles\console\Console;
 use stubbles\input\ValueReader;
-use org\bovigo\releaseit\composer\Package;
 
 use function stubbles\reflect\annotationsPresentOnConstructor;
 /**
- * Test for org\bovigo\releaseit\AskingVersionFinder.
+ * Test for bovigo\releaseit\AskingVersionFinder.
  */
 class AskingVersionFinderTestCase extends \PHPUnit_Framework_TestCase
 {
@@ -47,12 +49,12 @@ class AskingVersionFinderTestCase extends \PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
-        $this->mockConsole         = $this->getMockBuilder('stubbles\console\Console')
+        $this->mockConsole         = $this->getMockBuilder(Console::class)
                                           ->disableOriginalConstructor()
                                           ->getMock();
         $this->askingVersionFinder = new AskingVersionFinder($this->mockConsole);
         $this->package             = new Package(array());
-        $this->mockRepository      = $this->createMock('org\bovigo\releaseit\repository\Repository');
+        $this->mockRepository      = $this->createMock(Repository::class);
     }
 
     /**

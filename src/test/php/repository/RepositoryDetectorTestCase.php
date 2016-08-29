@@ -5,12 +5,12 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
- * @package  org\bovigo\releaseit
+ * @package  bovigo\releaseit
  */
-namespace org\bovigo\releaseit\repository;
+namespace bovigo\releaseit\repository;
 use org\bovigo\vfs\vfsStream;
 /**
- * Test for org\bovigo\releaseit\repository\RepositoryDetector.
+ * Test for bovigo\releaseit\repository\RepositoryDetector.
  */
 class RepositoryDetectorTestCase extends \PHPUnit_Framework_TestCase
 {
@@ -48,7 +48,7 @@ class RepositoryDetectorTestCase extends \PHPUnit_Framework_TestCase
      */
     public function missingRepositoryInfoFolderResultsInNoRepository()
     {
-        $this->assertInstanceOf('org\bovigo\releaseit\repository\NoRepository',
+        $this->assertInstanceOf(NoRepository::class,
                                $this->repositoryDetector->detect($this->root->url())
         );
     }
@@ -62,7 +62,7 @@ class RepositoryDetectorTestCase extends \PHPUnit_Framework_TestCase
         $this->mockExecutor->expects($this->once())
                            ->method('outputOf')
                            ->will($this->returnValue(array('URL: http://svn.example.org/svn/foo/trunk')));
-        $this->assertInstanceOf('org\bovigo\releaseit\repository\SvnRepository',
+        $this->assertInstanceOf(SvnRepository::class,
                                $this->repositoryDetector->detect($this->root->url())
         );
     }
@@ -73,7 +73,7 @@ class RepositoryDetectorTestCase extends \PHPUnit_Framework_TestCase
     public function gitFolderResultsInGitRepository()
     {
         vfsStream::newDirectory('.git')->at($this->root);
-        $this->assertInstanceOf('org\bovigo\releaseit\repository\GitRepository',
+        $this->assertInstanceOf(GitRepository::class,
                                $this->repositoryDetector->detect($this->root->url())
         );
     }
@@ -85,7 +85,7 @@ class RepositoryDetectorTestCase extends \PHPUnit_Framework_TestCase
     {
         vfsStream::newDirectory('.git')->at($this->root);
         vfsStream::newDirectory('.svn')->at($this->root);
-        $this->assertInstanceOf('org\bovigo\releaseit\repository\GitRepository',
+        $this->assertInstanceOf(GitRepository::class,
                                $this->repositoryDetector->detect($this->root->url())
         );
     }

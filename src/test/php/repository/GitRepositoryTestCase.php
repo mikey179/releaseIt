@@ -5,14 +5,14 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
- * @package  org\bovigo\releaseit
+ * @package  bovigo\releaseit
  */
-namespace org\bovigo\releaseit\repository;
-use org\bovigo\releaseit\Series;
-use org\bovigo\releaseit\Version;
+namespace bovigo\releaseit\repository;
+use bovigo\releaseit\Series;
+use bovigo\releaseit\Version;
 use org\bovigo\vfs\vfsStream;
 /**
- * Test for org\bovigo\releaseit\repository\GitRepository.
+ * Test for bovigo\releaseit\repository\GitRepository.
  */
 class GitRepositoryTestCase extends \PHPUnit_Framework_TestCase
 {
@@ -47,7 +47,7 @@ class GitRepositoryTestCase extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
-     * @expectedException  org\bovigo\releaseit\repository\RepositoryError
+     * @expectedException  bovigo\releaseit\repository\RepositoryError
      * @expectedExceptionMessage   Failure while checking git status
      */
     public function isDirtyThrowsRepositoryErrorWhenGitStatusFails()
@@ -60,7 +60,7 @@ class GitRepositoryTestCase extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
-     * @expectedException  org\bovigo\releaseit\repository\RepositoryError
+     * @expectedException  bovigo\releaseit\repository\RepositoryError
      * @expectedExceptionMessage   Current directory is not a git repository
      */
     public function isDirtyThrowsRepositoryErrorWhenCurrentFolderIsNoGitRepository()
@@ -109,7 +109,7 @@ class GitRepositoryTestCase extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
-     * @expectedException  org\bovigo\releaseit\repository\RepositoryError
+     * @expectedException  bovigo\releaseit\repository\RepositoryError
      * @expectedExceptionMessage   Failure while retrieving current branch
      */
     public function getBranchThrowsRepositoryErrorWhenGitBranchFails()
@@ -122,7 +122,7 @@ class GitRepositoryTestCase extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
-     * @expectedException  org\bovigo\releaseit\repository\RepositoryError
+     * @expectedException  bovigo\releaseit\repository\RepositoryError
      * @expectedExceptionMessage   Failure while retrieving current branch
      */
     public function getBranchThrowsRepositoryErrorWhenGitBranchReturnsNoOutput()
@@ -148,7 +148,7 @@ class GitRepositoryTestCase extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
-     * @expectedException  org\bovigo\releaseit\repository\RepositoryError
+     * @expectedException  bovigo\releaseit\repository\RepositoryError
      * @expectedExceptionMessage   Failure while retrieving last releases
      */
     public function getLastReleasesThrowsRepositoryErrorWhenGitTagFails()
@@ -176,7 +176,7 @@ class GitRepositoryTestCase extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
-     * @expectedException  org\bovigo\releaseit\repository\RepositoryError
+     * @expectedException  bovigo\releaseit\repository\RepositoryError
      * @expectedExceptionMessage   Failure while creating release
      */
     public function createReleaseThrowsRepositoryErrorWhenGitTagFails()
