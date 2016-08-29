@@ -29,7 +29,7 @@ class SeriesTestCase extends \PHPUnit_Framework_TestCase
     /**
      * @test
      * @dataProvider  getInvalidSeriesNumbers
-     * @expectedException  net\stubbles\lang\exception\IllegalArgumentException
+     * @expectedException  \InvalidArgumentException
      */
     public function createWithInvalidSeriesNumberThrowsIllegalArgumentException($invalidNumber)
     {

@@ -8,9 +8,9 @@
  * @package  org\bovigo\releaseit
  */
 namespace org\bovigo\releaseit;
-use net\stubbles\console\Console;
-use net\stubbles\console\ConsoleApp;
-use net\stubbles\ioc\Binder;
+use stubbles\console\Console;
+use stubbles\console\ConsoleApp;
+use stubbles\ioc\Binder;
 use org\bovigo\releaseit\composer\Package;
 use org\bovigo\releaseit\composer\InvalidPackage;
 use org\bovigo\releaseit\repository\Repository;
@@ -50,22 +50,20 @@ class ReleaseIt extends ConsoleApp
     /**
      * returns list of bindings used for this application
      *
-     * @param   string  $projectPath
-     * @return  \net\stubbles\ioc\module\BindingModule[]
+     * @return  \stubbles\ioc\module\BindingModule[]
      */
-    public static function __bindings($projectPath)
+    public static function __bindings()
     {
-        return array(self::createArgumentsBindingModule(),
-                     self::createConsoleBindingModule(),
-                     self::createPropertiesBindingModule($projectPath)
-                         ->withCurrentWorkingDirectory(),
-                     function(Binder $binder)
-                     {
-                         $binder->bindList('org\bovigo\releaseit\VersionFinder')
-                                ->withValue('org\bovigo\releaseit\NextSeriesVersionFinder')
-                                ->withValue('org\bovigo\releaseit\AskingVersionFinder');
-                     }
-        );
+        return [
+                self::argumentParser(),
+                self::currentWorkingDirectory(),
+                function(Binder $binder)
+                {
+                    $binder->bindList('org\bovigo\releaseit\VersionFinder')
+                            ->withValue('org\bovigo\releaseit\NextSeriesVersionFinder')
+                            ->withValue('org\bovigo\releaseit\AskingVersionFinder');
+                }
+        ];
     }
 
     /**
@@ -75,14 +73,14 @@ class ReleaseIt extends ConsoleApp
      * @param  RepositoryDetector  $repoDetector
      * @param  VersionFinder       $versionFinder
      * @param  string              $cwd
-     * @Inject
-     * @Named{cwd}('net.stubbles.cwd')
+     * @Named{cwd}('stubbles.cwd')
      */
-    public function __construct(Console $console,
-                                RepositoryDetector $repoDetector,
-                                VersionFinder $versionFinder,
-                                $cwd)
-    {
+    public function __construct(
+            Console $console,
+            RepositoryDetector $repoDetector,
+            VersionFinder $versionFinder,
+            $cwd
+    ) {
         $this->console       = $console;
         $this->repoDetector  = $repoDetector;
         $this->versionFinder = $versionFinder;

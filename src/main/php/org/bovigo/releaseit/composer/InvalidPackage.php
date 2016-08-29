@@ -8,11 +8,19 @@
  * @package  org\bovigo\releaseit
  */
 namespace org\bovigo\releaseit\composer;
-use net\stubbles\lang\exception\Exception;
 /**
  * Denotes a package config error.
  */
-class InvalidPackage extends Exception
+class InvalidPackage extends \Exception
 {
-    // intentionally empty
+    /**
+     * constructor
+     *
+     * @param  string      $message  failure message
+     * @param  \Throwable  $cause    optional  actual failure cause
+     */
+    public function __construct(string $message, \Throwable $cause = null)
+    {
+        parent::__construct($message, 0, $cause);
+    }
 }

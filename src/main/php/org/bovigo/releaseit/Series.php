@@ -9,7 +9,6 @@
  */
 namespace org\bovigo\releaseit;
 use Herrera\Version\Validator;
-use net\stubbles\lang\exception\IllegalArgumentException;
 /**
  * Represents a series of versions.
  */
@@ -39,14 +38,14 @@ class Series
      * constructor
      *
      * @param   string  $number
-     * @throws  IllegalArgumentException
+     * @throws  \InvalidArgumentException
      */
     public function __construct($number)
     {
         $this->number = $this->stripLeadingV($number);
         $this->type   = $this->calculateSeriesType($number);
         if (null === $this->type || !Validator::isVersion($this->getAppendedNumber())) {
-            throw new IllegalArgumentException('Given value ' . $number . ' is not a valid series number');
+            throw new \InvalidArgumentException('Given value ' . $number . ' is not a valid series number');
         }
     }
 
@@ -131,4 +130,3 @@ class Series
         return 'v' . $this->number;
     }
 }
-

@@ -15,7 +15,7 @@ class VersionTestCase extends \PHPUnit_Framework_TestCase
 {
     /**
      * @test
-     * @expectedException  net\stubbles\lang\exception\IllegalArgumentException
+     * @expectedException  \InvalidArgumentException
      */
     public function createWithInvalidVersionNumberThrowsIllegalArgumentException()
     {

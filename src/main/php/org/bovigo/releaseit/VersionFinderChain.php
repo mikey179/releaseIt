@@ -28,7 +28,6 @@ class VersionFinderChain implements VersionFinder
      * constructor
      *
      * @param  VersionFinder[]  $finders
-     * @Inject
      * @List(org\bovigo\releaseit\VersionFinder.class)
      */
     public function __construct(array $finders)

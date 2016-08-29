@@ -38,7 +38,7 @@ class RepositoryDetectorTestCase extends \PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
-        $this->mockExecutor       = $this->getMock('net\stubbles\console\Executor');
+        $this->mockExecutor       = $this->createPartialMock('stubbles\console\Executor', ['outputOf', 'executeAsync']);
         $this->repositoryDetector = new RepositoryDetector($this->mockExecutor);
         $this->root               = vfsStream::setup();
     }
@@ -60,7 +60,7 @@ class RepositoryDetectorTestCase extends \PHPUnit_Framework_TestCase
     {
         vfsStream::newDirectory('.svn')->at($this->root);
         $this->mockExecutor->expects($this->once())
-                           ->method('executeDirect')
+                           ->method('outputOf')
                            ->will($this->returnValue(array('URL: http://svn.example.org/svn/foo/trunk')));
         $this->assertInstanceOf('org\bovigo\releaseit\repository\SvnRepository',
                                $this->repositoryDetector->detect($this->root->url())

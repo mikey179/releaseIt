@@ -8,11 +8,19 @@
  * @package  org\bovigo\releaseit
  */
 namespace org\bovigo\releaseit\repository;
-use net\stubbles\lang\exception\Exception;
 /**
  * Denotes a repository error.
  */
-class RepositoryError extends Exception
+class RepositoryError extends \Exception
 {
-    // intentionally empty
+    /**
+     * constructor
+     *
+     * @param  string      $message  failure message
+     * @param  \Throwable  $cause    optional  actual failure cause
+     */
+    public function __construct(string $message, \Throwable $cause = null)
+    {
+        parent::__construct($message, 0, $cause);
+    }
 }

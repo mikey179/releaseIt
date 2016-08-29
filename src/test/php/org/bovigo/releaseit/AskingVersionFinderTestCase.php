@@ -8,9 +8,10 @@
  * @package  org\bovigo\releaseit
  */
 namespace org\bovigo\releaseit;
-use net\stubbles\input\ValueReader;
-use net\stubbles\lang;
+use stubbles\input\ValueReader;
 use org\bovigo\releaseit\composer\Package;
+
+use function stubbles\reflect\annotationsPresentOnConstructor;
 /**
  * Test for org\bovigo\releaseit\AskingVersionFinder.
  */
@@ -46,20 +47,12 @@ class AskingVersionFinderTestCase extends \PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
-        $this->mockConsole         = $this->getMockBuilder('net\stubbles\console\Console')
+        $this->mockConsole         = $this->getMockBuilder('stubbles\console\Console')
                                           ->disableOriginalConstructor()
                                           ->getMock();
         $this->askingVersionFinder = new AskingVersionFinder($this->mockConsole);
         $this->package             = new Package(array());
-        $this->mockRepository      = $this->getMock('org\bovigo\releaseit\repository\Repository');
-    }
-
-    /**
-     * @test
-     */
-    public function annotationsPresentOnConstructor()
-    {
-        $this->assertTrue(lang\reflectConstructor($this->askingVersionFinder)->hasAnnotation('Inject'));
+        $this->mockRepository      = $this->createMock('org\bovigo\releaseit\repository\Repository');
     }
 
     /**

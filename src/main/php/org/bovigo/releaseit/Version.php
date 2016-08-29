@@ -9,7 +9,6 @@
  */
 namespace org\bovigo\releaseit;
 use Herrera\Version\Validator;
-use net\stubbles\lang\exception\IllegalArgumentException;
 /**
  * Represents a version number.
  */
@@ -26,13 +25,13 @@ class Version
      * constructor
      *
      * @param   string  $number
-     * @throws  IllegalArgumentException
+     * @throws  \InvalidArgumentException
      */
     public function __construct($number)
     {
         $this->number = $this->stripLeadingV($number);
         if (!Validator::isVersion($this->number)) {
-            throw new IllegalArgumentException('Given value ' . $number . ' is not a valid version number');
+            throw new \InvalidArgumentException('Given value ' . $number . ' is not a valid version number');
         }
     }
 

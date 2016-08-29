@@ -8,9 +8,10 @@
  * @package  org\bovigo\releaseit
  */
 namespace org\bovigo\releaseit\repository;
-use net\stubbles\console\Executor;
-use net\stubbles\lang\exception\RuntimeException;
+use stubbles\console\Executor;
 use org\bovigo\releaseit\Version;
+
+use function stubbles\console\collect;
 /**
  * Provides access to a git repository.
  */
@@ -56,7 +57,7 @@ class GitRepository implements Repository
      */
     public function readStatus()
     {
-        return $this->execute('git status', 'Failure while checking git status', 'executeAsync');
+        return $this->executor->executeAsync('git status');
     }
 
     /**
@@ -113,8 +114,10 @@ class GitRepository implements Repository
     private function execute($command, $errorMessage, $method = 'executeDirect')
     {
         try {
-            return $this->executor->$method($command);
-        } catch (RuntimeException $e) {
+            $data = [];
+            $this->executor->execute($command, collect($data));
+            return $data;
+        } catch (\RuntimeException $e) {
             throw new RepositoryError($errorMessage, $e);
         }
     }

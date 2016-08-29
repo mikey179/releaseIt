@@ -8,9 +8,10 @@
  * @package  org\bovigo\releaseit
  */
 namespace org\bovigo\releaseit;
-use net\stubbles\input\ValueReader;
-use net\stubbles\lang;
+use stubbles\input\ValueReader;
 use org\bovigo\vfs\vfsStream;
+
+use function stubbles\reflect\annotationsOf;
 /**
  * Test for org\bovigo\releaseit\ReleaseIt.
  */
@@ -46,13 +47,13 @@ class ReleaseItTestCase extends \PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
-        $this->mockConsole       = $this->getMockBuilder('net\stubbles\console\Console')
+        $this->mockConsole       = $this->getMockBuilder('stubbles\console\Console')
                                         ->disableOriginalConstructor()
                                         ->getMock();
         $this->mockRepoDetector  = $this->getMockBuilder('org\bovigo\releaseit\repository\RepositoryDetector')
                                         ->disableOriginalConstructor()
                                         ->getMock();
-        $this->mockVersionFinder = $this->getMock('org\bovigo\releaseit\VersionFinder');
+        $this->mockVersionFinder = $this->createMock('org\bovigo\releaseit\VersionFinder');
         $root                    = vfsStream::setup();
         vfsStream::newFile('composer.json')->withContent('{}')->at($root);
         $this->releaseIt        = new ReleaseIt($this->mockConsole,
@@ -67,15 +68,7 @@ class ReleaseItTestCase extends \PHPUnit_Framework_TestCase
      */
     public function annotationsPresentOnClass()
     {
-        $this->assertTrue(lang\reflect($this->releaseIt)->hasAnnotation('AppDescription'));
-    }
-
-    /**
-     * @test
-     */
-    public function annotationsPresentOnConstructor()
-    {
-        $this->assertTrue(lang\reflectConstructor($this->releaseIt)->hasAnnotation('Inject'));
+        $this->assertTrue(annotationsOf($this->releaseIt)->contain('AppDescription'));
     }
 
     /**
@@ -102,7 +95,7 @@ class ReleaseItTestCase extends \PHPUnit_Framework_TestCase
      */
     private function createMockRepository()
     {
-        $mockRepository = $this->getMock('org\bovigo\releaseit\repository\Repository');
+        $mockRepository = $this->createMock('org\bovigo\releaseit\repository\Repository');
         $this->mockRepoDetector->expects(($this->once()))
                                ->method('detect')
                                ->will($this->returnValue($mockRepository));
@@ -118,7 +111,7 @@ class ReleaseItTestCase extends \PHPUnit_Framework_TestCase
         $mockRepository->expects(($this->once()))
                        ->method('isDirty')
                        ->will($this->returnValue(true));
-        $mockRepositoryStatus = $this->getMock('net\stubbles\streams\InputStream');
+        $mockRepositoryStatus = $this->createMock('stubbles\streams\InputStream');
         $mockRepositoryStatus->expects($this->once())
                              ->method('readLine')
                              ->will($this->returnValue('A  foo.php'));
@@ -187,7 +180,7 @@ class ReleaseItTestCase extends \PHPUnit_Framework_TestCase
     public function canCreateInstance()
     {
         $this->assertInstanceOf('org\bovigo\releaseit\ReleaseIt',
-                                ReleaseIt::create(\net\stubbles\lang\ResourceLoader::getRootPath())
+                                ReleaseIt::create(new \stubbles\values\Rootpath())
         );
     }
 }

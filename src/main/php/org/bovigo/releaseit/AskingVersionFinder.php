@@ -8,8 +8,7 @@
  * @package  org\bovigo\releaseit
  */
 namespace org\bovigo\releaseit;
-use net\stubbles\console\Console;
-use net\stubbles\lang\exception\IllegalArgumentException;
+use stubbles\console\Console;
 use org\bovigo\releaseit\composer\Package;
 use org\bovigo\releaseit\repository\Repository;
 /**
@@ -28,7 +27,6 @@ class AskingVersionFinder implements VersionFinder
      * constructor
      *
      * @param  Console  $console
-     * @Inject
      */
     public function __construct(Console $console)
     {
@@ -76,10 +74,9 @@ class AskingVersionFinder implements VersionFinder
                 return new Version($this->console->prompt('Please name the version to release (press Ctrl+C to abort): ')
                                                  ->unsecure()
                 );
-            } catch (IllegalArgumentException $e) {
+            } catch (\InvalidArgumentException $e) {
                 $this->console->writeLine($e->getMessage());
             }
         }
     }
 }
-

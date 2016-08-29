@@ -8,7 +8,6 @@
  * @package  org\bovigo\releaseit
  */
 namespace org\bovigo\releaseit;
-use net\stubbles\lang;
 use org\bovigo\releaseit\composer\Package;
 /**
  * Test for org\bovigo\releaseit\NextSeriesVersionFinder.
@@ -45,20 +44,12 @@ class NextSeriesVersionFinderTestCase extends \PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
-        $this->mockConsole             = $this->getMockBuilder('net\stubbles\console\Console')
+        $this->mockConsole             = $this->getMockBuilder('stubbles\console\Console')
                                               ->disableOriginalConstructor()
                                               ->getMock();
         $this->nextSeriesVersionFinder = new NextSeriesVersionFinder($this->mockConsole);
         $this->package                 = new Package(array('extra' => array('branch-alias' => array('dev-master' => '1.0.x-dev'))));
-        $this->mockRepository          = $this->getMock('org\bovigo\releaseit\repository\Repository');
-    }
-
-    /**
-     * @test
-     */
-    public function annotationsPresentOnConstructor()
-    {
-        $this->assertTrue(lang\reflectConstructor($this->nextSeriesVersionFinder)->hasAnnotation('Inject'));
+        $this->mockRepository          = $this->createMock('org\bovigo\releaseit\repository\Repository');
     }
 
     /**

@@ -8,8 +8,10 @@
  * @package  org\bovigo\releaseit
  */
 namespace org\bovigo\releaseit;
-use net\stubbles\lang;
 use org\bovigo\releaseit\composer\Package;
+
+use function stubbles\reflect\annotationsOf;
+use function stubbles\reflect\annotationsOfConstructor;
 /**
  * Test for org\bovigo\releaseit\VersionFinderChain.
  */
@@ -34,7 +36,7 @@ class VersionFinderChainTestCase extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->package            = new Package(array());
-        $this->mockRepository     = $this->getMock('org\bovigo\releaseit\repository\Repository');
+        $this->mockRepository     = $this->createMock('org\bovigo\releaseit\repository\Repository');
     }
 
     /**
@@ -42,9 +44,7 @@ class VersionFinderChainTestCase extends \PHPUnit_Framework_TestCase
      */
     public function annotationsPresentOnConstructor()
     {
-        $constructor = lang\reflectConstructor('org\bovigo\releaseit\VersionFinderChain');
-        $this->assertTrue($constructor->hasAnnotation('Inject'));
-        $this->assertTrue($constructor->hasAnnotation('List'));
+        $this->assertTrue(annotationsOfConstructor('org\bovigo\releaseit\VersionFinderChain')->contain('List'));
     }
 
     /**
@@ -53,8 +53,8 @@ class VersionFinderChainTestCase extends \PHPUnit_Framework_TestCase
     public function isDefaultImplementationForVersionFinder()
     {
         $this->assertEquals('org\bovigo\releaseit\VersionFinderChain',
-                            lang\reflect('org\bovigo\releaseit\VersionFinder')
-                                  ->getAnnotation('ImplementedBy')
+                            annotationsOf('org\bovigo\releaseit\VersionFinder')
+                                  ->firstNamed('ImplementedBy')
                                   ->getValue()
                                   ->getName()
         );
@@ -65,11 +65,11 @@ class VersionFinderChainTestCase extends \PHPUnit_Framework_TestCase
      */
     public function returnsNoVersionIfNoFinderReturnsOne()
     {
-        $mockVersionFinder1 = $this->getMock('org\bovigo\releaseit\VersionFinder');
+        $mockVersionFinder1 = $this->createMock('org\bovigo\releaseit\VersionFinder');
         $mockVersionFinder1->expects($this->once())
                            ->method('find')
                            ->will($this->returnValue(null));
-        $mockVersionFinder2 = $this->getMock('org\bovigo\releaseit\VersionFinder');
+        $mockVersionFinder2 = $this->createMock('org\bovigo\releaseit\VersionFinder');
         $mockVersionFinder2->expects($this->once())
                            ->method('find')
                            ->will($this->returnValue(null));
@@ -83,15 +83,15 @@ class VersionFinderChainTestCase extends \PHPUnit_Framework_TestCase
     public function returnsVersionByFirstFinderWhichReturnsOne()
     {
         $version = new Version('1.0.1');
-        $mockVersionFinder1 = $this->getMock('org\bovigo\releaseit\VersionFinder');
+        $mockVersionFinder1 = $this->createMock('org\bovigo\releaseit\VersionFinder');
         $mockVersionFinder1->expects($this->once())
                            ->method('find')
                            ->will($this->returnValue(null));
-        $mockVersionFinder2 = $this->getMock('org\bovigo\releaseit\VersionFinder');
+        $mockVersionFinder2 = $this->createMock('org\bovigo\releaseit\VersionFinder');
         $mockVersionFinder2->expects($this->once())
                            ->method('find')
                            ->will($this->returnValue($version));
-        $mockVersionFinder3 = $this->getMock('org\bovigo\releaseit\VersionFinder');
+        $mockVersionFinder3 = $this->createMock('org\bovigo\releaseit\VersionFinder');
         $mockVersionFinder3->expects($this->never())
                            ->method('find');
         $versionFinderChain = new VersionFinderChain(array($mockVersionFinder1, $mockVersionFinder2, $mockVersionFinder3));

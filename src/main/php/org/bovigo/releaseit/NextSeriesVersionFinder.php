@@ -8,7 +8,7 @@
  * @package  org\bovigo\releaseit
  */
 namespace org\bovigo\releaseit;
-use net\stubbles\console\Console;
+use stubbles\console\Console;
 use org\bovigo\releaseit\composer\Package;
 use org\bovigo\releaseit\repository\Repository;
 /**
@@ -28,7 +28,6 @@ class NextSeriesVersionFinder implements VersionFinder
      * constructor
      *
      * @param  Console  $console
-     * @Inject
      */
     public function __construct(Console $console)
     {

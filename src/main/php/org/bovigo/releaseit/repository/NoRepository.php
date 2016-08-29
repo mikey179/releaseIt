@@ -8,7 +8,7 @@
  * @package  org\bovigo\releaseit
  */
 namespace org\bovigo\releaseit\repository;
-use net\stubbles\streams\memory\MemoryInputStream;
+use stubbles\streams\memory\MemoryInputStream;
 use org\bovigo\releaseit\Version;
 /**
  * Denotes a non- or unknown type of repository.

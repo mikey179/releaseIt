@@ -8,7 +8,7 @@
  * @package  org\bovigo\releaseit
  */
 namespace org\bovigo\releaseit\repository;
-use net\stubbles\console\Executor;
+use stubbles\console\Executor;
 /**
  * The repository detector checks the current path and tries to find out what type
  * of repository it is.

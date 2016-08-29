@@ -5,15 +5,14 @@
     "license": "BSD-3-Clause",
     "description": "Helps to create releases from current checkout",
     "require": {
-        "php": ">=5.3.0",
-        "stubbles/core": "~3.2",
-        "stubbles/console": "~2.6",
-        "herrera-io/version": "~1.0",
-        "hampel/json": "~1.0"
+        "php": "^7.0",
+        "stubbles/console": "^7.0.1",
+        "herrera-io/version": "^1.0",
+        "hampel/json": "^1.0"
     },
     "require-dev": {
-        "mikey179/vfsStream": "~1.1",
-        "phpunit/phpunit": "~3.7"
+        "mikey179/vfsStream": "^1.6",
+        "phpunit/phpunit": "^5.5"
     },
     "autoload": {
         "psr-0": {

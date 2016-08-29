@@ -8,9 +8,10 @@
  * @package  org\bovigo\releaseit
  */
 namespace org\bovigo\releaseit\repository;
-use net\stubbles\console\Executor;
-use net\stubbles\lang\exception\RuntimeException;
+use stubbles\console\Executor;
 use org\bovigo\releaseit\Version;
+
+use function stubbles\console\collect;
 /**
  * Provides access to a svn repository.
  */
@@ -103,7 +104,7 @@ class SvnRepository implements Repository
      */
     public function readStatus()
     {
-        return $this->execute('svn status', 'Failure while checking svn status', 'executeAsync');
+        return $this->executor->executeAsync('svn status');
     }
 
     /**
@@ -164,11 +165,13 @@ class SvnRepository implements Repository
      * @return  string[]|InputStream
      * @throws  RepositoryError
      */
-    private function execute($command, $errorMessage, $method = 'executeDirect')
+    private function execute($command, $errorMessage)
     {
         try {
-            return $this->executor->$method($command);
-        } catch (RuntimeException $e) {
+            $data = [];
+            $this->executor->execute($command, collect($data));
+            return $data;
+        } catch (\RuntimeException $e) {
             throw new RepositoryError($errorMessage, $e);
         }
     }
