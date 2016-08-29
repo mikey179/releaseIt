@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * This file is part of ReleaseIt.
  *
@@ -36,8 +37,8 @@ class VersionFinderChainTestCase extends \PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
-        $this->package            = new Package(array());
-        $this->mockRepository     = $this->createMock(Repository::class);
+        $this->package        = new Package([]);
+        $this->mockRepository = $this->createMock(Repository::class);
     }
 
     /**
@@ -74,7 +75,7 @@ class VersionFinderChainTestCase extends \PHPUnit_Framework_TestCase
         $mockVersionFinder2->expects($this->once())
                            ->method('find')
                            ->will($this->returnValue(null));
-        $versionFinderChain = new VersionFinderChain(array($mockVersionFinder1, $mockVersionFinder2));
+        $versionFinderChain = new VersionFinderChain([$mockVersionFinder1, $mockVersionFinder2]);
         $this->assertNull($versionFinderChain->find($this->package, $this->mockRepository));
     }
 
@@ -95,7 +96,7 @@ class VersionFinderChainTestCase extends \PHPUnit_Framework_TestCase
         $mockVersionFinder3 = $this->createMock(VersionFinder::class);
         $mockVersionFinder3->expects($this->never())
                            ->method('find');
-        $versionFinderChain = new VersionFinderChain(array($mockVersionFinder1, $mockVersionFinder2, $mockVersionFinder3));
+        $versionFinderChain = new VersionFinderChain([$mockVersionFinder1, $mockVersionFinder2, $mockVersionFinder3]);
         $this->assertEquals($version, $versionFinderChain->find($this->package, $this->mockRepository));
     }
 }

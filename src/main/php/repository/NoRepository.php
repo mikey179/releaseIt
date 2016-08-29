@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * This file is part of ReleaseIt.
  *
@@ -8,7 +9,9 @@
  * @package  bovigo\releaseit
  */
 namespace bovigo\releaseit\repository;
+use bovigo\releaseit\Series;
 use bovigo\releaseit\Version;
+use stubbles\streams\InputStream;
 use stubbles\streams\memory\MemoryInputStream;
 /**
  * Denotes a non- or unknown type of repository.
@@ -20,7 +23,7 @@ class NoRepository implements Repository
      *
      * @return  bool
      */
-    public function isDirty()
+    public function isDirty(): bool
     {
         return true;
     }
@@ -30,9 +33,11 @@ class NoRepository implements Repository
      *
      * @return  InputStream
      */
-    public function readStatus()
+    public function readStatus(): InputStream
     {
-        return new MemoryInputStream('Current directory is not a known type of repository');
+        return new MemoryInputStream(
+                'Current directory is not a known type of repository'
+        );
     }
 
     /**
@@ -40,21 +45,21 @@ class NoRepository implements Repository
      *
      * @return  string
      */
-    public function getBranch()
+    public function getBranch(): string
     {
-        return null;
+        return '';
     }
 
     /**
      * returns a list of the last releases
      *
-     * @param   string  $series  limit releases to those of a certain series, i.e. v2 or v2.1, defaults to all
+     * @param   Series  $series  limit releases to those of a certain series, i.e. v2 or v2.1, defaults to all
      * @param   int     $amount  limit amount of releases to retrieve, defaults to 5
      * @return  string[]
      */
-    public function getLastReleases($series = 'v', $amount = 5)
+    public function getLastReleases(Series $series = null, int $amount = 5): array
     {
-        return array();
+        return [];
     }
 
     /**
@@ -64,8 +69,10 @@ class NoRepository implements Repository
      * @return  string[]
      * @throws  RepositoryError
      */
-    public function createRelease(Version $version)
+    public function createRelease(Version $version): array
     {
-        throw new RepositoryError('Can\'t create release here, is not a known repository');
+        throw new RepositoryError(
+                'Can\'t create release here, is not a known repository'
+        );
     }
 }

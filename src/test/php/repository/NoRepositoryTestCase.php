@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * This file is part of ReleaseIt.
  *
@@ -52,7 +53,7 @@ class NoRepositoryTestCase extends \PHPUnit_Framework_TestCase
      */
     public function hasNoBranch()
     {
-        $this->assertNull($this->noRepository->getBranch());
+        $this->assertEquals('', $this->noRepository->getBranch());
     }
 
     /**
@@ -60,7 +61,7 @@ class NoRepositoryTestCase extends \PHPUnit_Framework_TestCase
      */
     public function hasNoLastReleases()
     {
-        $this->assertEquals(array(), $this->noRepository->getLastReleases());
+        $this->assertEquals([], $this->noRepository->getLastReleases());
     }
 
     /**

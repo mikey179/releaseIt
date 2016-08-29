@@ -1,11 +1,12 @@
 #!/usr/bin/env php
 <?php
+declare(strict_types=1);
 /**
- * Script to execute org\bovigo\releaseit\ReleaseIt.
+ * Script to execute bovigo\releaseit\ReleaseIt.
  *
- * @package  org\bovigo\releaseit
+ * @package  bovigo\releaseit
  */
-namespace org\bovigo\releaseit;
+namespace bovigo\releaseit;
 if (\Phar::running() !== '') {
     $rootDir     = \Phar::running();
     $projectPath = getcwd();

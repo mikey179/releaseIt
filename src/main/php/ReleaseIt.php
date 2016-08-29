@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * This file is part of ReleaseIt.
  *
@@ -49,7 +50,7 @@ class ReleaseIt extends ConsoleApp
      *
      * @return  \stubbles\ioc\module\BindingModule[]
      */
-    public static function __bindings()
+    public static function __bindings(): array
     {
         return [
                 self::argumentParser(),
@@ -89,7 +90,7 @@ class ReleaseIt extends ConsoleApp
      *
      * @return  int
      */
-    public function run()
+    public function run(): int
     {
         try {
             $package = Package::fromFile($this->cwd . DIRECTORY_SEPARATOR . 'composer.json');
@@ -105,7 +106,9 @@ class ReleaseIt extends ConsoleApp
 
         $version = $this->versionFinder->find($package, $repository);
         if (null === $version) {
-            $this->console->writeErrorLine('Can not create release, unable to find a version for this release.');
+            $this->console->writeErrorLine(
+                    'Can not create release, unable to find a version for this release.'
+            );
             return 23;
         }
 
@@ -120,7 +123,7 @@ class ReleaseIt extends ConsoleApp
      * @param   Repository  $repository
      * @return  bool
      */
-    private function isDirty(Repository $repository)
+    private function isDirty(Repository $repository): bool
     {
         if ($repository->isDirty()) {
             $this->console->writeErrorLine('Can\'t create release, working directory not clean.');

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * This file is part of ReleaseIt.
  *
@@ -50,7 +51,7 @@ class NextSeriesVersionFinderTestCase extends \PHPUnit_Framework_TestCase
                                               ->disableOriginalConstructor()
                                               ->getMock();
         $this->nextSeriesVersionFinder = new NextSeriesVersionFinder($this->mockConsole);
-        $this->package                 = new Package(array('extra' => array('branch-alias' => array('dev-master' => '1.0.x-dev'))));
+        $this->package                 = new Package(['extra' => ['branch-alias' => ['dev-master' => '1.0.x-dev']]]);
         $this->mockRepository          = $this->createMock(Repository::class);
     }
 
@@ -79,7 +80,7 @@ class NextSeriesVersionFinderTestCase extends \PHPUnit_Framework_TestCase
         $this->mockRepository->expects(($this->once()))
                              ->method('getLastReleases')
                              ->with($this->equalTo(new Series('1.0')), $this->equalTo(1))
-                             ->will($this->returnValue(array()));
+                             ->will($this->returnValue([]));
         $this->mockConsole->expects($this->once())
                           ->method('writeLine')
                           ->with($this->equalTo('No release in series v1.0 yet, determined v1.0.0 as first version number.'));
@@ -100,7 +101,7 @@ class NextSeriesVersionFinderTestCase extends \PHPUnit_Framework_TestCase
         $this->mockRepository->expects(($this->once()))
                              ->method('getLastReleases')
                              ->with($this->equalTo(new Series('1.0')), $this->equalTo(1))
-                             ->will($this->returnValue(array()));
+                             ->will($this->returnValue([]));
         $this->mockConsole->expects($this->once())
                           ->method('writeLine')
                           ->with($this->equalTo('No release in series v1.0 yet, determined v1.0.0 as first version number.'));
@@ -123,7 +124,7 @@ class NextSeriesVersionFinderTestCase extends \PHPUnit_Framework_TestCase
         $this->mockRepository->expects(($this->once()))
                              ->method('getLastReleases')
                              ->with($this->equalTo(new Series('1.0')), $this->equalTo(1))
-                             ->will($this->returnValue(array('v1.0.1')));
+                             ->will($this->returnValue(['v1.0.1']));
         $this->mockConsole->expects($this->once())
                           ->method('writeLine')
                           ->with($this->equalTo('Last release in series v1.0 was v1.0.1, determined v1.0.2 as next version number.'));
@@ -144,7 +145,7 @@ class NextSeriesVersionFinderTestCase extends \PHPUnit_Framework_TestCase
         $this->mockRepository->expects(($this->once()))
                              ->method('getLastReleases')
                              ->with($this->equalTo(new Series('1.0')), $this->equalTo(1))
-                             ->will($this->returnValue(array('v1.0.1')));
+                             ->will($this->returnValue(['v1.0.1']));
         $this->mockConsole->expects($this->once())
                           ->method('writeLine')
                           ->with($this->equalTo('Last release in series v1.0 was v1.0.1, determined v1.0.2 as next version number.'));

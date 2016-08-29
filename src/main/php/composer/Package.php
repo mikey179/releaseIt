@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * This file is part of ReleaseIt.
  *
@@ -40,10 +41,12 @@ class Package
      * @return  Package
      * @throws  InvalidPackage
      */
-    public static function fromFile($filename)
+    public static function fromFile(string $filename): self
     {
         if (!file_exists($filename)) {
-            throw new InvalidPackage('No composer.json found - are you sure this is a composer package?');
+            throw new InvalidPackage(
+                    'No composer.json found - are you sure this is a composer package?'
+            );
         }
 
         try{
@@ -61,7 +64,7 @@ class Package
      * @param   string  $branch
      * @return  string
      */
-    public function getBranchAlias($branch)
+    public function getBranchAlias(string $branch)
     {
         if (isset($this->config['extra']['branch-alias'][$branch])) {
             return $this->config['extra']['branch-alias'][$branch];
@@ -78,7 +81,7 @@ class Package
      * @param   string  $branch
      * @return  Series
      */
-    public function getSeries($branch)
+    public function getSeries(string $branch)
     {
         $branchAlias = $this->getBranchAlias($branch);
         if (null === $branchAlias) {

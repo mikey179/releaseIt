@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * This file is part of ReleaseIt.
  *
@@ -61,7 +62,7 @@ class RepositoryDetectorTestCase extends \PHPUnit_Framework_TestCase
         vfsStream::newDirectory('.svn')->at($this->root);
         $this->mockExecutor->expects($this->once())
                            ->method('outputOf')
-                           ->will($this->returnValue(array('URL: http://svn.example.org/svn/foo/trunk')));
+                           ->will($this->returnValue(['URL: http://svn.example.org/svn/foo/trunk']));
         $this->assertInstanceOf(SvnRepository::class,
                                $this->repositoryDetector->detect($this->root->url())
         );

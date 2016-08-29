@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * This file is part of ReleaseIt.
  *
@@ -9,6 +10,8 @@
  */
 namespace bovigo\releaseit\repository;
 use stubbles\console\Executor;
+use stubbles\streams\InputStream;
+use bovigo\releaseit\Series;
 use bovigo\releaseit\Version;
 
 use function stubbles\console\collect;
@@ -40,9 +43,12 @@ class GitRepository implements Repository
      * @return  bool
      * @throws  RepositoryError
      */
-    public function isDirty()
+    public function isDirty(): bool
     {
-        $output = $this->execute('git status 2> /dev/null | tail -n1', 'Failure while checking git status');
+        $output = $this->execute(
+                'git status 2> /dev/null | tail -n1',
+                'Failure while checking git status'
+        );
         if (!isset($output[0])) {
             throw new RepositoryError('Current directory is not a git repository');
         }
@@ -55,7 +61,7 @@ class GitRepository implements Repository
      *
      * @return  InputStream
      */
-    public function readStatus()
+    public function readStatus(): InputStream
     {
         return $this->executor->executeAsync('git status');
     }
@@ -65,7 +71,7 @@ class GitRepository implements Repository
      *
      * @return  string
      */
-    public function getBranch()
+    public function getBranch(): string
     {
         $output = $this->execute('git branch', 'Failure while retrieving current branch');
         if (!isset($output[0])) {
@@ -78,13 +84,20 @@ class GitRepository implements Repository
     /**
      * returns a list of the last releases
      *
-     * @param   string  $series  limit releases to those of a certain series, i.e. v2 or v2.1, defaults to all
+     * @param   Series  $series  limit releases to those of a certain series, i.e. v2 or v2.1, defaults to all
      * @param   int     $amount  limit amount of releases to retrieve, defaults to 5
      * @return  string[]
      */
-    public function getLastReleases($series = 'v', $amount = 5)
+    public function getLastReleases(Series $series = null, int $amount = 5): array
     {
-        return $this->execute('git tag -l | grep "' . $series . '" | sort -r | head -' . $amount, 'Failure while retrieving last releases');
+        if (null === $series) {
+            $series = 'v';
+        }
+
+        return $this->execute(
+                'git tag -l | grep "' . $series . '" | sort -r | head -' . $amount,
+                'Failure while retrieving last releases'
+        );
     }
 
     /**
@@ -93,10 +106,12 @@ class GitRepository implements Repository
      * @param   Version  $version
      * @return  string[]
      */
-    public function createRelease(Version $version)
+    public function createRelease(Version $version): array
     {
-        return $this->execute('git tag -a ' . $version . ' -m "tag release ' . $version . '" && git push --tags',
-                              'Failure while creating release'
+        return $this->execute(
+                'git tag -a ' . $version . ' -m "tag release ' . $version
+                . '" && git push --tags',
+                'Failure while creating release'
         );
     }
 
@@ -107,11 +122,10 @@ class GitRepository implements Repository
      *
      * @param   string  $command
      * @param   string  $errorMessage
-     * @param   string  $method
-     * @return  string[]|InputStream
+     * @return  string[]
      * @throws  RepositoryError
      */
-    private function execute($command, $errorMessage, $method = 'executeDirect')
+    private function execute(string $command, string $errorMessage): array
     {
         try {
             $data = [];

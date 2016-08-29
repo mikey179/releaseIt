@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * This file is part of ReleaseIt.
  *
@@ -12,6 +13,7 @@ use bovigo\releaseit\repository\Repository;
 use bovigo\releaseit\repository\RepositoryDetector;
 use stubbles\console\Console;
 use stubbles\input\ValueReader;
+use stubbles\values\Rootpath;
 use org\bovigo\vfs\vfsStream;
 
 use function stubbles\reflect\annotationsOf;
@@ -166,10 +168,10 @@ class ReleaseItTestCase extends \PHPUnit_Framework_TestCase
         $mockRepository->expects(($this->once()))
                        ->method('createRelease')
                        ->with($this->equalTo($version))
-                       ->will($this->returnValue(array('foo', 'bar')));
+                       ->will($this->returnValue(['foo', 'bar']));
         $this->mockConsole->expects($this->once())
                           ->method('writeLines')
-                          ->with($this->equalTo(array('foo', 'bar')))
+                          ->with($this->equalTo(['foo', 'bar']))
                           ->will($this->returnSelf());
         $this->mockConsole->expects($this->once())
                           ->method('writeLine')
@@ -183,7 +185,7 @@ class ReleaseItTestCase extends \PHPUnit_Framework_TestCase
     public function canCreateInstance()
     {
         $this->assertInstanceOf(ReleaseIt::class,
-                                ReleaseIt::create(new \stubbles\values\Rootpath())
+                                ReleaseIt::create(Rootpath::default())
         );
     }
 }

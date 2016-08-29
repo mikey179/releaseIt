@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * This file is part of ReleaseIt.
  *
@@ -45,17 +46,27 @@ class NextSeriesVersionFinder implements VersionFinder
     {
         $series = $package->getSeries('dev-' . $repository->getBranch());
         if (empty($series)) {
-            $this->console->writeLine('Can not determine current series for branch ' . $repository->getBranch());
+            $this->console->writeLine(
+                    'Can not determine current series for branch '
+                    . $repository->getBranch()
+            );
             return null;
         }
 
         $lastReleaseInSeries = $this->getLastReleaseInSeries($series, $repository);
         if (null === $lastReleaseInSeries) {
             $version = $series->getFirstVersion();
-            $this->console->writeLine('No release in series ' . $series . ' yet, determined ' . $version . ' as first version number.');
+            $this->console->writeLine(
+                    'No release in series ' . $series . ' yet, determined '
+                    . $version . ' as first version number.'
+            );
         } else {
             $version = $series->getNextVersion($lastReleaseInSeries);
-            $this->console->writeLine('Last release in series ' . $series . ' was ' . $lastReleaseInSeries . ', determined ' . $version . ' as next version number.');
+            $this->console->writeLine(
+                    'Last release in series ' . $series . ' was '
+                    . $lastReleaseInSeries . ', determined ' . $version
+                    . ' as next version number.'
+            );
         }
 
         if ($this->console->confirm('Do you want to create a release with this version number? ')) {

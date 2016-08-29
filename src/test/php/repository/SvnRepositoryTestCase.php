@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * This file is part of ReleaseIt.
  *
@@ -43,7 +44,7 @@ class SvnRepositoryTestCase extends \PHPUnit_Framework_TestCase
         $this->mockExecutor  = $this->createPartialMock('stubbles\console\Executor', ['outputOf', 'executeAsync']);
         $this->mockExecutor->expects($this->at(0))
                            ->method('outputOf')
-                           ->will($this->returnValue(array('URL: http://svn.example.org/svn/foo/trunk')));
+                           ->will($this->returnValue(['URL: http://svn.example.org/svn/foo/trunk']));
         $this->svnRepository = new SvnRepository($this->mockExecutor);
         $this->root          = vfsStream::setup();
     }
@@ -72,7 +73,7 @@ class SvnRepositoryTestCase extends \PHPUnit_Framework_TestCase
         $mockExecutor  = $this->createPartialMock('stubbles\console\Executor', ['outputOf', 'executeAsync']);
         $mockExecutor->expects($this->once())
                      ->method('outputOf')
-                     ->will($this->returnValue(array()));
+                     ->will($this->returnValue([]));
         new SvnRepository($mockExecutor);
     }
 
@@ -86,7 +87,7 @@ class SvnRepositoryTestCase extends \PHPUnit_Framework_TestCase
         $mockExecutor  = $this->createPartialMock('stubbles\console\Executor', ['outputOf', 'executeAsync']);
         $mockExecutor->expects($this->once())
                      ->method('outputOf')
-                     ->will($this->returnValue(array('URL: http://svn.example.org/svn/foo')));
+                     ->will($this->returnValue(['URL: http://svn.example.org/svn/foo']));
         new SvnRepository($mockExecutor);
     }
 
@@ -98,7 +99,7 @@ class SvnRepositoryTestCase extends \PHPUnit_Framework_TestCase
         $mockExecutor  = $this->createPartialMock('stubbles\console\Executor', ['outputOf', 'executeAsync']);
         $mockExecutor->expects($this->once())
                      ->method('outputOf')
-                     ->will($this->returnValue(array('URL: http://svn.example.org/svn/foo/branches/v1.1.x')));
+                     ->will($this->returnValue(['URL: http://svn.example.org/svn/foo/branches/v1.1.x']));
         $this->assertInstanceOf(SvnRepository::class,
                                 new SvnRepository($mockExecutor)
         );
@@ -124,7 +125,7 @@ class SvnRepositoryTestCase extends \PHPUnit_Framework_TestCase
     {
         $this->mockExecutor->expects($this->once())
                            ->method('outputOf')
-                           ->will($this->returnValue(array('A  readme.md')));
+                           ->will($this->returnValue(['A  readme.md']));
         $this->assertTrue($this->svnRepository->isDirty());
     }
 
@@ -135,7 +136,7 @@ class SvnRepositoryTestCase extends \PHPUnit_Framework_TestCase
     {
         $this->mockExecutor->expects($this->once())
                            ->method('outputOf')
-                           ->will($this->returnValue(array()));
+                           ->will($this->returnValue([]));
         $this->assertFalse($this->svnRepository->isDirty());
     }
 
@@ -171,7 +172,7 @@ class SvnRepositoryTestCase extends \PHPUnit_Framework_TestCase
         $mockExecutor  = $this->createPartialMock('stubbles\console\Executor', ['outputOf', 'executeAsync']);
         $mockExecutor->expects($this->once())
                      ->method('outputOf')
-                     ->will($this->returnValue(array('URL: http://svn.example.org/svn/foo/branches/cool-new-feature')));
+                     ->will($this->returnValue(['URL: http://svn.example.org/svn/foo/branches/cool-new-feature']));
         $svnRepository = new SvnRepository($mockExecutor);
         $this->assertEquals('cool-new-feature',
                             $svnRepository->getBranch()
@@ -200,8 +201,8 @@ class SvnRepositoryTestCase extends \PHPUnit_Framework_TestCase
         $this->mockExecutor->expects($this->once())
                            ->method('outputOf')
                            ->with($this->equalTo('svn list http://svn.example.org/svn/foo/tags | grep "v1.0" | sort -r | head -2'))
-                           ->will(($this->returnValue(array('v1.0.0/', 'v1.0.1/'))));
-        $this->assertEquals(array('v1.0.0', 'v1.0.1'),
+                           ->will(($this->returnValue(['v1.0.0/', 'v1.0.1/'])));
+        $this->assertEquals(['v1.0.0', 'v1.0.1'],
                             $this->svnRepository->getLastReleases(new Series('1.0'), 2)
         );
     }
@@ -224,7 +225,7 @@ class SvnRepositoryTestCase extends \PHPUnit_Framework_TestCase
      */
     public function createReleaseReturnsOutputFromCreatingTag()
     {
-        $svnCpOutput = array('Committed revision 303.');
+        $svnCpOutput = ['Committed revision 303.'];
         $this->mockExecutor->expects($this->once())
                            ->method('outputOf')
                            ->with($this->equalTo('svn cp . http://svn.example.org/svn/foo/tags/v1.1.0 -m "tag release v1.1.0"'))

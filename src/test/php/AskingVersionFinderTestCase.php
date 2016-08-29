@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * This file is part of ReleaseIt.
  *
@@ -53,7 +54,7 @@ class AskingVersionFinderTestCase extends \PHPUnit_Framework_TestCase
                                           ->disableOriginalConstructor()
                                           ->getMock();
         $this->askingVersionFinder = new AskingVersionFinder($this->mockConsole);
-        $this->package             = new Package(array());
+        $this->package             = new Package([]);
         $this->mockRepository      = $this->createMock(Repository::class);
     }
 
@@ -64,7 +65,7 @@ class AskingVersionFinderTestCase extends \PHPUnit_Framework_TestCase
     {
         $this->mockRepository->expects($this->once())
                              ->method('getLastReleases')
-                             ->will($this->returnValue(array('v1.0.0', 'v1.0.1')));
+                             ->will($this->returnValue(['v1.0.0', 'v1.0.1']));
         $this->mockConsole->expects($this->at(1))
                           ->method('writeLine')
                           ->with($this->equalTo('v1.0.0'));
@@ -86,7 +87,7 @@ class AskingVersionFinderTestCase extends \PHPUnit_Framework_TestCase
     {
         $this->mockRepository->expects($this->once())
                              ->method('getLastReleases')
-                             ->will($this->returnValue(array()));
+                             ->will($this->returnValue([]));
         $this->mockConsole->expects($this->exactly(2))
                           ->method('prompt')
                           ->will($this->onConsecutiveCalls(ValueReader::forValue('foo'),

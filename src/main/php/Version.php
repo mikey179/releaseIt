@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * This file is part of ReleaseIt.
  *
@@ -27,11 +28,13 @@ class Version
      * @param   string  $number
      * @throws  \InvalidArgumentException
      */
-    public function __construct($number)
+    public function __construct(string $number)
     {
         $this->number = $this->stripLeadingV($number);
         if (!Validator::isVersion($this->number)) {
-            throw new \InvalidArgumentException('Given value ' . $number . ' is not a valid version number');
+            throw new \InvalidArgumentException(
+                    'Given value ' . $number . ' is not a valid version number'
+            );
         }
     }
 
@@ -41,7 +44,7 @@ class Version
      * @param   string  $value
      * @return  string
      */
-    private function stripLeadingV($value)
+    private function stripLeadingV(string $value): string
     {
         if (substr($value, 0, 1) === 'v') {
             return substr($value, 1);
@@ -57,7 +60,7 @@ class Version
      *
      * @return  Version
      */
-    public function increaseMinor()
+    public function increaseMinor(): self
     {
         list($major, $minor) = explode('.', $this->number);
         $minor++;
@@ -71,7 +74,7 @@ class Version
      *
      * @return  Version
      */
-    public function increasePatchLevel()
+    public function increasePatchLevel(): self
     {
         list($major, $minor, $patchLevel) = explode('.', $this->number);
         $patchLevel++;
@@ -83,7 +86,7 @@ class Version
      *
      * @return  string
      */
-    public function __toString()
+    public function __toString(): string
     {
         return 'v' . $this->number;
     }

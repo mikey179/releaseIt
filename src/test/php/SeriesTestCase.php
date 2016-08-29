@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * This file is part of ReleaseIt.
  *
@@ -20,11 +21,12 @@ class SeriesTestCase extends \PHPUnit_Framework_TestCase
      */
     public function getInvalidSeriesNumbers()
     {
-        return array(array('foo'),
-                     array('1.0.x-dev'),
-                     array('1.0.1'),
-                     array('v1.0.1')
-        );
+        return [
+                ['foo'],
+                ['1.0.x-dev'],
+                ['1.0.1'],
+                ['v1.0.1']
+        ];
     }
     /**
      * @test

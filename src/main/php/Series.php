@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * This file is part of ReleaseIt.
  *
@@ -26,13 +27,17 @@ class Series
      */
     private $type;
     /**
+     * unknown series type
+     */
+    const TYPE_UNKNOWN = 0;
+    /**
      * series type major: 1
      */
-    const TYPE_MAJOR = 1;
+    const TYPE_MAJOR   = 1;
     /**
      * series type minor: 1.1
      */
-    const TYPE_MINOR = 3;
+    const TYPE_MINOR   = 3;
 
     /**
      * constructor
@@ -40,12 +45,14 @@ class Series
      * @param   string  $number
      * @throws  \InvalidArgumentException
      */
-    public function __construct($number)
+    public function __construct(string $number)
     {
         $this->number = $this->stripLeadingV($number);
         $this->type   = $this->calculateSeriesType($number);
-        if (null === $this->type || !Validator::isVersion($this->getAppendedNumber())) {
-            throw new \InvalidArgumentException('Given value ' . $number . ' is not a valid series number');
+        if (self::TYPE_UNKNOWN === $this->type || !Validator::isVersion($this->getAppendedNumber())) {
+            throw new \InvalidArgumentException(
+                    'Given value ' . $number . ' is not a valid series number'
+            );
         }
     }
 
@@ -55,7 +62,7 @@ class Series
      * @param   string  $value
      * @return  string
      */
-    private function stripLeadingV($number)
+    private function stripLeadingV(string $number): string
     {
         if (substr($number, 0, 1) === 'v') {
             return substr($number, 1);
@@ -69,22 +76,23 @@ class Series
      *
      * @return  int
      */
-    private function calculateSeriesType()
+    private function calculateSeriesType(): int
     {
         if (strlen($this->number) === self::TYPE_MAJOR) {
             return self::TYPE_MAJOR;
         } elseif (strlen($this->number) === self::TYPE_MINOR) {
             return self::TYPE_MINOR;
         }
+
+        return self::TYPE_UNKNOWN;
     }
 
     /**
      * creates a number that will satisfy the validator which expects a complete version number
      *
-     * @param   string  $number
      * @return  string
      */
-    private function getAppendedNumber()
+    private function getAppendedNumber(): string
     {
         if (self::TYPE_MAJOR === $this->type) {
             return $this->number . '.0.0';
@@ -100,7 +108,7 @@ class Series
      *
      * @return  Version
      */
-    public function getFirstVersion()
+    public function getFirstVersion(): Version
     {
         return new Version($this->getAppendedNumber());
     }
@@ -111,7 +119,7 @@ class Series
      * @param   Version  $current
      * @return  Version
      */
-    public function getNextVersion(Version $current)
+    public function getNextVersion(Version $current): Version
     {
         if (self::TYPE_MAJOR === $this->type) {
             return $current->increaseMinor();
@@ -125,7 +133,7 @@ class Series
      *
      * @return  string
      */
-    public function __toString()
+    public function __toString(): string
     {
         return 'v' . $this->number;
     }

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * This file is part of ReleaseIt.
  *
@@ -26,7 +27,6 @@ class RepositoryDetector
      * constructor
      *
      * @param  Executor  $executor
-     * @Inject
      */
     public function __construct(Executor $executor)
     {
@@ -39,7 +39,7 @@ class RepositoryDetector
      * @param   string  $path
      * @return  Repository
      */
-    public function detect($path)
+    public function detect(string $path): Repository
     {
         if (file_exists($path . DIRECTORY_SEPARATOR . '.git')) {
             return new GitRepository($this->executor);

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * This file is part of ReleaseIt.
  *
@@ -51,7 +52,7 @@ class AskingVersionFinder implements VersionFinder
      * @param   Repository  $repository
      * @return  AskingVersionFinder
      */
-    private function echoLastReleases(Repository $repository)
+    private function echoLastReleases(Repository $repository): self
     {
         $this->console->writeLine('Last 5 releases:');
         foreach ($repository->getLastReleases() as $release) {
@@ -67,12 +68,14 @@ class AskingVersionFinder implements VersionFinder
      *
      * @return  Version
      */
-    private function askForVersion()
+    private function askForVersion(): Version
     {
         while (true) {
             try {
-                return new Version($this->console->prompt('Please name the version to release (press Ctrl+C to abort): ')
-                                                 ->unsecure()
+                return new Version(
+                        $this->console->prompt(
+                                'Please name the version to release (press Ctrl+C to abort): '
+                        )->unsecure()
                 );
             } catch (\InvalidArgumentException $e) {
                 $this->console->writeLine($e->getMessage());

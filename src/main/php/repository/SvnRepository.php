@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * This file is part of ReleaseIt.
  *
@@ -8,8 +9,10 @@
  * @package  bovigo\releaseit
  */
 namespace bovigo\releaseit\repository;
-use stubbles\console\Executor;
+use bovigo\releaseit\Series;
 use bovigo\releaseit\Version;
+use stubbles\console\Executor;
+use stubbles\streams\InputStream;
 
 use function stubbles\console\collect;
 /**
@@ -46,8 +49,6 @@ class SvnRepository implements Repository
 
     /**
      * retrieves SVN URL of project
-     *
-     * @return string
      */
     private function parseCheckout()
     {
@@ -59,7 +60,9 @@ class SvnRepository implements Repository
         }
 
         if (null === $this->svnTagsUrl) {
-            throw new RepositoryError('Could not retrieve svn tag url, can not create release for this svn repository');
+            throw new RepositoryError(
+                    'Could not retrieve svn tag url, can not create release for this svn repository'
+            );
         }
     }
 
@@ -80,7 +83,10 @@ class SvnRepository implements Repository
              return strstr($svnUrl, '/branches/', true) . '/tags';
          }
 
-         throw new RepositoryError('Can not extract tag url from current svn checkout url ' . $svnUrl);
+         throw new RepositoryError(
+                'Can not extract tag url from current svn checkout url '
+                . $svnUrl
+        );
     }
 
     /**
@@ -92,9 +98,12 @@ class SvnRepository implements Repository
      * @return  bool
      * @throws  RepositoryError
      */
-    public function isDirty()
+    public function isDirty(): bool
     {
-        return (count($this->execute('svn status 2>&1 | tail -n1', 'Failure while checking svn status')) !== 0);
+        return (0 !== count($this->execute(
+                'svn status 2>&1 | tail -n1',
+                'Failure while checking svn status'
+        )));
     }
 
     /**
@@ -102,7 +111,7 @@ class SvnRepository implements Repository
      *
      * @return  InputStream
      */
-    public function readStatus()
+    public function readStatus(): InputStream
     {
         return $this->executor->executeAsync('svn status');
     }
@@ -112,7 +121,7 @@ class SvnRepository implements Repository
      *
      * @return  string
      */
-    public function getBranch()
+    public function getBranch(): string
     {
         if (strstr($this->svnUrl, '/trunk') !== false) {
             return 'trunk';
@@ -125,19 +134,23 @@ class SvnRepository implements Repository
     /**
      * returns a list of the last releases
      *
-     * @param   string  $series  limit releases to those of a certain series, i.e. v2 or v2.1, defaults to all
+     * @param   Series  $series  limit releases to those of a certain series, i.e. v2 or v2.1, defaults to all
      * @param   int     $amount  limit amount of releases to retrieve, defaults to 5
      * @return  string[]
      */
-    public function getLastReleases($series = 'v', $amount = 5)
+    public function getLastReleases(Series $series = null, int $amount = 5): array
     {
-        return array_map(function($value)
-                         {
-                            return rtrim($value, '/');
-                         },
-                         $this->execute('svn list ' . $this->svnTagsUrl . ' | grep "' . $series . '" | sort -r | head -' . $amount,
-                                        'Failure while retrieving last releases'
-                         )
+        if (null === $series) {
+            $series = 'v';
+        }
+
+        return array_map(
+                function($value) { return rtrim($value, '/'); },
+                $this->execute(
+                        'svn list ' . $this->svnTagsUrl . ' | grep "' . $series
+                        . '" | sort -r | head -' . $amount,
+                        'Failure while retrieving last releases'
+                )
         );
     }
 
@@ -147,10 +160,12 @@ class SvnRepository implements Repository
      * @param   Version  $version
      * @return  string[]
      */
-    public function createRelease(Version $version)
+    public function createRelease(Version $version): array
     {
-        return $this->execute('svn cp . ' . $this->svnTagsUrl . '/' . $version . ' -m "tag release ' . $version . '"',
-                              'Failure while creating release'
+        return $this->execute(
+                'svn cp . ' . $this->svnTagsUrl . '/' . $version
+                . ' -m "tag release ' . $version . '"',
+                'Failure while creating release'
         );
     }
 
@@ -161,11 +176,10 @@ class SvnRepository implements Repository
      *
      * @param   string  $command
      * @param   string  $errorMessage
-     * @param   string  $method
-     * @return  string[]|InputStream
+     * @return  string[]
      * @throws  RepositoryError
      */
-    private function execute($command, $errorMessage)
+    private function execute(string $command, string $errorMessage): array
     {
         try {
             $data = [];

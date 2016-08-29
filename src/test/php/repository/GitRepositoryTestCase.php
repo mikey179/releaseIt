@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * This file is part of ReleaseIt.
  *
@@ -67,7 +68,7 @@ class GitRepositoryTestCase extends \PHPUnit_Framework_TestCase
     {
         $this->mockExecutor->expects($this->once())
                            ->method('outputOf')
-                           ->will($this->returnValue(array()));
+                           ->will($this->returnValue([]));
         $this->gitRepository->isDirty();
     }
 
@@ -78,7 +79,7 @@ class GitRepositoryTestCase extends \PHPUnit_Framework_TestCase
     {
         $this->mockExecutor->expects($this->once())
                            ->method('outputOf')
-                           ->will($this->returnValue(array('# Changes to be committed:')));
+                           ->will($this->returnValue(['# Changes to be committed:']));
         $this->assertTrue($this->gitRepository->isDirty());
     }
 
@@ -89,7 +90,7 @@ class GitRepositoryTestCase extends \PHPUnit_Framework_TestCase
     {
         $this->mockExecutor->expects($this->once())
                            ->method('outputOf')
-                           ->will($this->returnValue(array('nothing to commit, working directory clean')));
+                           ->will($this->returnValue(['nothing to commit, working directory clean']));
         $this->assertFalse($this->gitRepository->isDirty());
     }
 
@@ -129,7 +130,7 @@ class GitRepositoryTestCase extends \PHPUnit_Framework_TestCase
     {
         $this->mockExecutor->expects($this->once())
                            ->method('outputOf')
-                           ->will(($this->returnValue(array())));
+                           ->will(($this->returnValue([])));
         $this->gitRepository->getBranch();
     }
 
@@ -140,7 +141,7 @@ class GitRepositoryTestCase extends \PHPUnit_Framework_TestCase
     {
         $this->mockExecutor->expects($this->once())
                            ->method('outputOf')
-                           ->will(($this->returnValue(array('* master'))));
+                           ->will(($this->returnValue(['* master'])));
         $this->assertEquals('master',
                             $this->gitRepository->getBranch()
         );
@@ -168,8 +169,8 @@ class GitRepositoryTestCase extends \PHPUnit_Framework_TestCase
         $this->mockExecutor->expects($this->once())
                            ->method('outputOf')
                            ->with($this->equalTo('git tag -l | grep "v1.0" | sort -r | head -2'))
-                           ->will(($this->returnValue(array('v1.0.0', 'v1.0.1'))));
-        $this->assertEquals(array('v1.0.0', 'v1.0.1'),
+                           ->will(($this->returnValue(['v1.0.0', 'v1.0.1'])));
+        $this->assertEquals(['v1.0.0', 'v1.0.1'],
                             $this->gitRepository->getLastReleases(new Series('1.0'), 2)
         );
     }
@@ -192,12 +193,13 @@ class GitRepositoryTestCase extends \PHPUnit_Framework_TestCase
      */
     public function createReleaseReturnsOutputFromCreatingTag()
     {
-        $gitTagOutput = array('Counting objects: 1, done.',
-                              'Writing objects: 100% (1/1), 159 bytes | 0 bytes/s, done.',
-                              'Total 1 (delta 0), reused 0 (delta 0)',
-                              'To git@github.com:example/foo.git',
-                              ' * [new tag]         v1.1.0 -> v1.1.0'
-        );
+        $gitTagOutput = [
+                'Counting objects: 1, done.',
+                'Writing objects: 100% (1/1), 159 bytes | 0 bytes/s, done.',
+                'Total 1 (delta 0), reused 0 (delta 0)',
+                'To git@github.com:example/foo.git',
+                ' * [new tag]         v1.1.0 -> v1.1.0'
+        ];
         $this->mockExecutor->expects($this->once())
                            ->method('outputOf')
                            ->will(($this->returnValue($gitTagOutput)));

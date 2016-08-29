@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * This file is part of ReleaseIt.
  *
@@ -8,7 +9,9 @@
  * @package  bovigo\releaseit
  */
 namespace bovigo\releaseit\repository;
+use bovigo\releaseit\Series;
 use bovigo\releaseit\Version;
+use stubbles\streams\InputStream;
 /**
  * Provides access to a repository.
  */
@@ -19,30 +22,30 @@ interface Repository
      *
      * @return  bool
      */
-    public function isDirty();
+    public function isDirty(): bool;
 
     /**
      * provides an input stream to read the current repository status
      *
      * @return  InputStream
      */
-    public function readStatus();
+    public function readStatus(): InputStream;
 
     /**
      * returns branch of repository
      *
      * @return  string
      */
-    public function getBranch();
+    public function getBranch(): string;
 
     /**
      * returns a list of the last releases
      *
-     * @param   string  $series  limit releases to those of a certain series, i.e. v2 or v2.1, defaults to all
+     * @param   Series  $series  limit releases to those of a certain series, i.e. v2 or v2.1, defaults to all
      * @param   int     $amount  limit amount of releases to retrieve, defaults to 5
      * @return  string[]
      */
-    public function getLastReleases($series = 'v', $amount = 5);
+    public function getLastReleases(Series $series = null, int $amount = 5): array;
 
     /**
      * creates a release with given version number
@@ -50,5 +53,5 @@ interface Repository
      * @param   Version  $version
      * @return  string[]
      */
-    public function createRelease(Version $version);
+    public function createRelease(Version $version): array;
 }
