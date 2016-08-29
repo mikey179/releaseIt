@@ -20,4 +20,3 @@ if (\Phar::running() !== '') {
 
 require $rootDir . '/vendor/autoload.php';
 exit(ReleaseIt::main(realpath($projectPath), \stubbles\console\ConsoleOutputStream::forError()));
-?>
