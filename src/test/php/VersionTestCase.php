@@ -9,6 +9,14 @@ declare(strict_types=1);
  * @package  bovigo\releaseit
  */
 namespace bovigo\releaseit;
+use function bovigo\assert\{
+    assert,
+    assertFalse,
+    assertTrue,
+    expect,
+    predicate\equals,
+    predicate\isNotSameAs
+};
 /**
  * Test for bovigo\releaseit\Version.
  */
@@ -16,11 +24,11 @@ class VersionTestCase extends \PHPUnit_Framework_TestCase
 {
     /**
      * @test
-     * @expectedException  \InvalidArgumentException
      */
-    public function createWithInvalidVersionNumberThrowsIllegalArgumentException()
+    public function createWithInvalidVersionNumberThrowsInvalidArgumentException()
     {
-        new Version('foo');
+        expect(function() { new Version('foo'); })
+                ->throws(\InvalidArgumentException::class);
     }
 
     /**
@@ -28,7 +36,7 @@ class VersionTestCase extends \PHPUnit_Framework_TestCase
      */
     public function createWithLeadingV()
     {
-        $this->assertEquals('v1.1.0', (string) new Version('v1.1.0'));
+        assert((string) new Version('v1.1.0'), equals('v1.1.0'));
     }
 
     /**
@@ -36,7 +44,7 @@ class VersionTestCase extends \PHPUnit_Framework_TestCase
      */
     public function createWithoutLeading()
     {
-        $this->assertEquals('v1.1.0', (string) new Version('1.1.0'));
+        assert((string) new Version('1.1.0'), equals('v1.1.0'));
     }
 
     /**
@@ -45,7 +53,7 @@ class VersionTestCase extends \PHPUnit_Framework_TestCase
     public function increaseMinorReturnsNewInstance()
     {
         $version = new Version('1.1.0');
-        $this->assertNotSame($version, $version->increaseMinor());
+        assert($version->increaseMinor(), isNotSameAs($version));
     }
 
     /**
@@ -54,7 +62,7 @@ class VersionTestCase extends \PHPUnit_Framework_TestCase
     public function increaseMinorReturnsNewVersionNumber()
     {
         $version = new Version('1.1.0');
-        $this->assertEquals('v1.2.0', (string) $version->increaseMinor());
+        assert((string) $version->increaseMinor(), equals('v1.2.0'));
     }
 
     /**
@@ -63,7 +71,7 @@ class VersionTestCase extends \PHPUnit_Framework_TestCase
     public function increasePatchLevelReturnsNewInstance()
     {
         $version = new Version('1.1.0');
-        $this->assertNotSame($version, $version->increasePatchLevel());
+        assert($version->increasePatchLevel(), isNotSameAs($version));
     }
 
     /**
@@ -72,6 +80,6 @@ class VersionTestCase extends \PHPUnit_Framework_TestCase
     public function increasePatchLevelReturnsNewVersionNumber()
     {
         $version = new Version('1.1.0');
-        $this->assertEquals('v1.1.1', (string) $version->increasePatchLevel());
+        assert((string) $version->increasePatchLevel(), equals('v1.1.1'));
     }
 }

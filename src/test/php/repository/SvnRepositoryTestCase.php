@@ -15,6 +15,15 @@ use org\bovigo\vfs\vfsStream;
 use stubbles\console\Executor;
 use stubbles\streams\InputStream;
 
+use function bovigo\assert\{
+    assert,
+    assertFalse,
+    assertTrue,
+    expect,
+    predicate\equals,
+    predicate\isInstanceOf,
+    predicate\isSameAs
+};
 use function bovigo\callmap\{verify, throws};
 /**
  * Test for bovigo\releaseit\repository\SvnRepository.
@@ -52,41 +61,43 @@ class SvnRepositoryTestCase extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
-     * @expectedException  bovigo\releaseit\repository\RepositoryError
-     * @expectedExceptionMessage   Failure while checking svn info
      */
     public function createInstanceThrowsRepositoryErrorWhenSvnInfoFails()
     {
         $executor = NewInstance::of(Executor::class)->returns([
                 'execute' => throws(new \RuntimeException('error'))
         ]);
-        new SvnRepository($executor);
+        expect(function() use ($executor) { new SvnRepository($executor); })
+                ->throws(RepositoryError::class)
+                ->withMessage('Failure while checking svn info');
     }
 
     /**
      * @test
-     * @expectedException  bovigo\releaseit\repository\RepositoryError
-     * @expectedExceptionMessage   Could not retrieve svn tag url, can not create release for this svn repository
      */
     public function createInstanceThrowsRepositoryErrorWhenSvnInfoDoesNotContainSvnUrl()
     {
-        $executor = NewInstance::of(Executor::class)->returns([
-                'outputOf' => []
-        ]);
-        new SvnRepository($executor);
+        $executor = NewInstance::of(Executor::class)->returns(['outputOf' => []]);
+        expect(function() use ($executor) { new SvnRepository($executor); })
+                ->throws(RepositoryError::class)
+                ->withMessage(
+                        'Could not retrieve svn tag url, can not create release for this svn repository'
+                );
     }
 
     /**
      * @test
-     * @expectedException  bovigo\releaseit\repository\RepositoryError
-     * @expectedExceptionMessage   Can not extract tag url from current svn checkout url http://svn.example.org/svn/foo
      */
     public function createInstanceThrowsRepositoryErrorWhenTagUrlCanNotBeDerivedFromSvnUrl()
     {
         $executor = NewInstance::of(Executor::class)->returns([
                 'outputOf' => ['URL: http://svn.example.org/svn/foo']
         ]);
-        new SvnRepository($executor);
+        expect(function() use ($executor) { new SvnRepository($executor); })
+                ->throws(RepositoryError::class)
+                ->withMessage(
+                        'Can not extract tag url from current svn checkout url http://svn.example.org/svn/foo'
+                );
     }
 
     /**
@@ -97,22 +108,21 @@ class SvnRepositoryTestCase extends \PHPUnit_Framework_TestCase
         $executor = NewInstance::of(Executor::class)->returns([
                 'outputOf' => ['URL: http://svn.example.org/svn/foo/branches/v1.1.x']
         ]);
-        $this->assertInstanceOf(SvnRepository::class,
-                                new SvnRepository($executor)
-        );
+        expect(function() use ($executor) { new SvnRepository($executor); })
+                ->doesNotThrow();
     }
 
     /**
      * @test
-     * @expectedException  bovigo\releaseit\repository\RepositoryError
-     * @expectedExceptionMessage   Failure while checking svn status
      */
     public function isDirtyThrowsRepositoryErrorWhenSvnStatusFails()
     {
         $this->executor->returns([
                     'outputOf' => throws(new \RuntimeException('error'))
         ]);
-        $this->svnRepository->isDirty();
+        expect(function() { $this->svnRepository->isDirty(); })
+                ->throws(RepositoryError::class)
+                ->withMessage('Failure while checking svn status');
     }
 
     /**
@@ -120,10 +130,8 @@ class SvnRepositoryTestCase extends \PHPUnit_Framework_TestCase
      */
     public function isDirtyReturnsTrueWhenCheckoutContainsUncomittedChanges()
     {
-        $this->executor->returns([
-                    'outputOf' => ['A  readme.md']
-        ]);
-        $this->assertTrue($this->svnRepository->isDirty());
+        $this->executor->returns(['outputOf' => ['A  readme.md']]);
+        assertTrue($this->svnRepository->isDirty());
     }
 
     /**
@@ -131,10 +139,8 @@ class SvnRepositoryTestCase extends \PHPUnit_Framework_TestCase
      */
     public function isDirtyReturnsFalseWhenCheckoutContainsNoUncomittedChanges()
     {
-        $this->executor->returns([
-                    'outputOf' => []
-        ]);
-        $this->assertFalse($this->svnRepository->isDirty());
+        $this->executor->returns(['outputOf' => []]);
+        assertFalse($this->svnRepository->isDirty());
     }
 
     /**
@@ -143,12 +149,8 @@ class SvnRepositoryTestCase extends \PHPUnit_Framework_TestCase
     public function readStatusReturnsInputStreamToReadResultFrom()
     {
         $inputStream = NewInstance::of(InputStream::class);
-        $this->executor->returns([
-                    'executeAsync' => $inputStream
-        ]);
-        $this->assertSame($inputStream,
-                          $this->svnRepository->readStatus()
-        );
+        $this->executor->returns(['executeAsync' => $inputStream]);
+        assert($this->svnRepository->readStatus(), isSameAs($inputStream));
     }
 
     /**
@@ -156,9 +158,7 @@ class SvnRepositoryTestCase extends \PHPUnit_Framework_TestCase
      */
     public function branchReturnsTrunkWhenWorkspaceIsTrunkCheckout()
     {
-        $this->assertEquals('trunk',
-                            $this->svnRepository->branch()
-        );
+        assert($this->svnRepository->branch(), equals('trunk'));
     }
 
     /**
@@ -170,22 +170,20 @@ class SvnRepositoryTestCase extends \PHPUnit_Framework_TestCase
                 'outputOf' => ['URL: http://svn.example.org/svn/foo/branches/cool-new-feature']
         ]);
         $svnRepository = new SvnRepository($executor);
-        $this->assertEquals('cool-new-feature',
-                            $svnRepository->branch()
-        );
+        assert($svnRepository->branch(), equals('cool-new-feature'));
     }
 
     /**
      * @test
-     * @expectedException  bovigo\releaseit\repository\RepositoryError
-     * @expectedExceptionMessage   Failure while retrieving last releases
      */
     public function lastReleasesThrowsRepositoryErrorWhenSvnListFails()
     {
         $this->executor->returns([
                     'outputOf' => throws(new \RuntimeException('error'))
         ]);
-        $this->svnRepository->lastReleases();
+        expect(function() { $this->svnRepository->lastReleases(); })
+                ->throws(RepositoryError::class)
+                ->withMessage('Failure while retrieving last releases');
     }
 
     /**
@@ -193,9 +191,7 @@ class SvnRepositoryTestCase extends \PHPUnit_Framework_TestCase
      */
     public function lastReleasesGrepsForTagsStartingWithVWhenNoSeriesGiven()
     {
-        $this->executor->returns([
-                    'outputOf' => ['v1.0.0/', 'v1.0.1/']
-        ]);
+        $this->executor->returns(['outputOf' => ['v1.0.0/', 'v1.0.1/']]);
         $this->svnRepository->lastReleases();
         verify($this->executor, 'execute')->receivedOn(
                 2,
@@ -208,11 +204,10 @@ class SvnRepositoryTestCase extends \PHPUnit_Framework_TestCase
      */
     public function lastReleasesReturnsListOfLastReleases()
     {
-        $this->executor->returns([
-                    'outputOf' => ['v1.0.0/', 'v1.0.1/']
-        ]);
-        $this->assertEquals(['v1.0.0', 'v1.0.1'],
-                            $this->svnRepository->lastReleases(new Series('1.0'), 2)
+        $this->executor->returns(['outputOf' => ['v1.0.0/', 'v1.0.1/']]);
+        assert(
+                $this->svnRepository->lastReleases(new Series('1.0'), 2),
+                equals(['v1.0.0', 'v1.0.1'])
         );
     }
 
@@ -221,9 +216,7 @@ class SvnRepositoryTestCase extends \PHPUnit_Framework_TestCase
      */
     public function lastReleasesGrepsForTagsStartingWithGivenSeries()
     {
-        $this->executor->returns([
-                    'outputOf' => ['v1.0.0/', 'v1.0.1/']
-        ]);
+        $this->executor->returns(['outputOf' => ['v1.0.0/', 'v1.0.1/']]);
         $this->svnRepository->lastReleases(new Series('1.0'), 2);
         verify($this->executor, 'execute')->receivedOn(
                 2,
@@ -233,15 +226,15 @@ class SvnRepositoryTestCase extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
-     * @expectedException  bovigo\releaseit\repository\RepositoryError
-     * @expectedExceptionMessage   Failure while creating release
      */
     public function createReleaseThrowsRepositoryErrorWhenSvnCpFails()
     {
         $this->executor->returns([
                     'outputOf' => throws(new \RuntimeException('error'))
         ]);
-        $this->svnRepository->createRelease(new Version('1.1.0'));
+        expect(function() { $this->svnRepository->createRelease(new Version('1.1.0')); })
+                ->throws(RepositoryError::class)
+                ->withMessage('Failure while creating release');
     }
 
     /**
@@ -250,11 +243,10 @@ class SvnRepositoryTestCase extends \PHPUnit_Framework_TestCase
     public function createReleaseReturnsOutputFromCreatingTag()
     {
         $svnCpOutput = ['Committed revision 303.'];
-        $this->executor->returns([
-                    'outputOf' => $svnCpOutput
-        ]);
-        $this->assertEquals($svnCpOutput,
-                            $this->svnRepository->createRelease(new Version('1.1.0'))
+        $this->executor->returns(['outputOf' => $svnCpOutput]);
+        assert(
+                $this->svnRepository->createRelease(new Version('1.1.0')),
+                equals($svnCpOutput)
         );
         verify($this->executor, 'outputOf')->receivedOn(
                 2,

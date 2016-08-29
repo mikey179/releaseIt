@@ -17,6 +17,12 @@ use stubbles\streams\InputStream;
 use stubbles\values\Rootpath;
 use org\bovigo\vfs\vfsStream;
 
+use function bovigo\assert\{
+    assert,
+    assertTrue,
+    predicate\equals,
+    predicate\isInstanceOf
+};
 use function bovigo\callmap\{verify, onConsecutiveCalls};
 use function stubbles\reflect\annotationsOf;
 /**
@@ -66,7 +72,7 @@ class ReleaseItTestCase extends \PHPUnit_Framework_TestCase
      */
     public function annotationsPresentOnClass()
     {
-        $this->assertTrue(annotationsOf($this->releaseIt)->contain('AppDescription'));
+        assertTrue(annotationsOf($this->releaseIt)->contain('AppDescription'));
     }
 
     /**
@@ -80,7 +86,7 @@ class ReleaseItTestCase extends \PHPUnit_Framework_TestCase
                 $this->versionFinder,
                 vfsStream::setup()->url()
         );
-        $this->assertEquals(21, $releaseIt->run());
+        assert($releaseIt->run(), equals(21));
         verify($this->console, 'writeErrorLine')->wasCalledOnce();
         verify($this->repoDetector, 'detect')->wasNeverCalled();
     }
@@ -105,7 +111,7 @@ class ReleaseItTestCase extends \PHPUnit_Framework_TestCase
                 'isDirty'    => true,
                 'readStatus' => $repositoryStatus
         ]);
-        $this->assertEquals(22, $this->releaseIt->run());
+        assert($this->releaseIt->run(), equals(22));
         verify($this->console, 'writeErrorLine')->receivedOn(2, 'A  foo.php');
     }
 
@@ -118,7 +124,7 @@ class ReleaseItTestCase extends \PHPUnit_Framework_TestCase
                 'isDirty' => false
         ]);
         $this->versionFinder->returns(['find' => null]);
-        $this->assertEquals(23, $this->releaseIt->run());
+        assert($this->releaseIt->run(), equals(23));
         verify($this->console, 'writeErrorLine')->received(
                 'Can not create release, unable to find a version for this release.'
         );
@@ -136,7 +142,7 @@ class ReleaseItTestCase extends \PHPUnit_Framework_TestCase
         ]);
         $version = new Version('v1.1.0');
         $this->versionFinder->returns(['find' => $version]);
-        $this->assertEquals(0, $this->releaseIt->run());
+        assert($this->releaseIt->run(), equals(0));
         verify($this->console, 'writeLines')->received(['foo', 'bar']);
         verify($this->console, 'writeLine')->received('Successfully created release v1.1.0');
         verify($repository, 'createRelease')->received($version);
@@ -147,8 +153,9 @@ class ReleaseItTestCase extends \PHPUnit_Framework_TestCase
      */
     public function canCreateInstance()
     {
-        $this->assertInstanceOf(ReleaseIt::class,
-                                ReleaseIt::create(Rootpath::default())
+        assert(
+                ReleaseIt::create(Rootpath::default()),
+                isInstanceOf(ReleaseIt::class)
         );
     }
 }

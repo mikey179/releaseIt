@@ -15,6 +15,7 @@ use bovigo\releaseit\repository\Repository;
 use stubbles\console\Console;
 use stubbles\input\ValueReader;
 
+use function bovigo\assert\{assert, predicate\equals};
 use function bovigo\callmap\{verify, onConsecutiveCalls, throws};
 use function stubbles\reflect\annotationsPresentOnConstructor;
 /**
@@ -61,8 +62,9 @@ class AskingVersionFinderTestCase extends \PHPUnit_Framework_TestCase
     {
         $this->repository->returns(['lastReleases' => ['v1.0.0', 'v1.0.1']]);
         $this->console->returns(['prompt' => ValueReader::forValue('v1.1.0')]);
-        $this->assertEquals(new Version('v1.1.0'),
-                            $this->askingVersionFinder->find($this->package, $this->repository)
+        assert(
+                $this->askingVersionFinder->find($this->package, $this->repository),
+                equals(new Version('v1.1.0'))
         );
         verify($this->console, 'writeLine')->receivedOn(2, 'v1.0.0');
         verify($this->console, 'writeLine')->receivedOn(3, 'v1.0.1');
@@ -78,8 +80,9 @@ class AskingVersionFinderTestCase extends \PHPUnit_Framework_TestCase
                 ValueReader::forValue('foo'),
                 ValueReader::forValue('v1.1.0')
         )]);
-        $this->assertEquals(new Version('v1.1.0'),
-                            $this->askingVersionFinder->find($this->package, $this->repository)
+        assert(
+                $this->askingVersionFinder->find($this->package, $this->repository),
+                equals(new Version('v1.1.0'))
         );
     }
 }

@@ -10,6 +10,15 @@ declare(strict_types=1);
  */
 namespace bovigo\releaseit\repository;
 use bovigo\releaseit\Version;
+
+use function bovigo\assert\{
+    assert,
+    assertEmptyArray,
+    assertEmptyString,
+    assertTrue,
+    expect,
+    predicate\equals
+};
 /**
  * Test for bovigo\releaseit\repository\NoRepository.
  */
@@ -35,7 +44,7 @@ class NoRepositoryTestCase extends \PHPUnit_Framework_TestCase
      */
     public function isAlwaysDirty()
     {
-        $this->assertTrue($this->noRepository->isDirty());
+        assertTrue($this->noRepository->isDirty());
     }
 
     /**
@@ -43,8 +52,9 @@ class NoRepositoryTestCase extends \PHPUnit_Framework_TestCase
      */
     public function readStatusReturnsInputStreamWithOneLine()
     {
-        $this->assertEquals('Current directory is not a known type of repository',
-                            $this->noRepository->readStatus()->readLine()
+        assert(
+                $this->noRepository->readStatus()->readLine(),
+                equals('Current directory is not a known type of repository')
         );
     }
 
@@ -53,7 +63,7 @@ class NoRepositoryTestCase extends \PHPUnit_Framework_TestCase
      */
     public function hasNoBranch()
     {
-        $this->assertEquals('', $this->noRepository->branch());
+        assertEmptyString($this->noRepository->branch());
     }
 
     /**
@@ -61,15 +71,15 @@ class NoRepositoryTestCase extends \PHPUnit_Framework_TestCase
      */
     public function hasNoLastReleases()
     {
-        $this->assertEquals([], $this->noRepository->lastReleases());
+        assertEmptyArray($this->noRepository->lastReleases());
     }
 
     /**
      * @test
-     * @expectedException  bovigo\releaseit\repository\RepositoryError
      */
     public function createReleaseThrowsRepositoryError()
     {
-        $this->noRepository->createRelease(new Version('1.0.0'));
+        expect(function() { $this->noRepository->createRelease(new Version('1.0.0')); })
+                ->throws(RepositoryError::class);
     }
 }

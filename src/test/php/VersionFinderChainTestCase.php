@@ -13,6 +13,12 @@ use bovigo\callmap\NewInstance;
 use bovigo\releaseit\composer\Package;
 use bovigo\releaseit\repository\Repository;
 
+use function bovigo\assert\{
+    assert,
+    assertNull,
+    assertTrue,
+    predicate\equals
+};
 use function bovigo\callmap\verify;
 use function stubbles\reflect\annotationsOf;
 use function stubbles\reflect\annotationsOfConstructor;
@@ -46,7 +52,9 @@ class VersionFinderChainTestCase extends \PHPUnit_Framework_TestCase
      */
     public function annotationsPresentOnConstructor()
     {
-        $this->assertTrue(annotationsOfConstructor(VersionFinderChain::class)->contain('List'));
+        assertTrue(
+                annotationsOfConstructor(VersionFinderChain::class)->contain('List')
+        );
     }
 
     /**
@@ -54,11 +62,12 @@ class VersionFinderChainTestCase extends \PHPUnit_Framework_TestCase
      */
     public function isDefaultImplementationForVersionFinder()
     {
-        $this->assertEquals(VersionFinderChain::class,
-                            annotationsOf(VersionFinder::class)
-                                  ->firstNamed('ImplementedBy')
-                                  ->getValue()
-                                  ->getName()
+        assert(
+                annotationsOf(VersionFinder::class)
+                        ->firstNamed('ImplementedBy')
+                        ->getValue()
+                        ->getName(),
+                equals(VersionFinderChain::class)
         );
     }
 
@@ -79,7 +88,7 @@ class VersionFinderChainTestCase extends \PHPUnit_Framework_TestCase
         $versionFinderChain = new VersionFinderChain([
                 $versionFinder1, $versionFinder2
         ]);
-        $this->assertNull($versionFinderChain->find($this->package, $this->repository));
+        assertNull($versionFinderChain->find($this->package, $this->repository));
     }
 
     /**
@@ -94,7 +103,10 @@ class VersionFinderChainTestCase extends \PHPUnit_Framework_TestCase
         $versionFinderChain = new VersionFinderChain([
                 $versionFinder1, $versionFinder2, $versionFinder3
         ]);
-        $this->assertEquals($version, $versionFinderChain->find($this->package, $this->repository));
+        assert(
+                $versionFinderChain->find($this->package, $this->repository),
+                equals($version)
+        );
         verify($versionFinder3, 'find')->wasNeverCalled();
     }
 }

@@ -12,6 +12,8 @@ namespace bovigo\releaseit\repository;
 use bovigo\callmap\NewInstance;
 use org\bovigo\vfs\vfsStream;
 use stubbles\console\Executor;
+
+use function bovigo\assert\{assert, predicate\isInstanceOf};
 /**
  * Test for bovigo\releaseit\repository\RepositoryDetector.
  */
@@ -49,8 +51,9 @@ class RepositoryDetectorTestCase extends \PHPUnit_Framework_TestCase
      */
     public function missingRepositoryInfoFolderResultsInNoRepository()
     {
-        $this->assertInstanceOf(NoRepository::class,
-                               $this->repositoryDetector->detect($this->root->url())
+        assert(
+                $this->repositoryDetector->detect($this->root->url()),
+                isInstanceOf(NoRepository::class)
         );
     }
 
@@ -63,8 +66,9 @@ class RepositoryDetectorTestCase extends \PHPUnit_Framework_TestCase
         $this->executor->returns([
                     'outputOf' => ['URL: http://svn.example.org/svn/foo/trunk']
         ]);
-        $this->assertInstanceOf(SvnRepository::class,
-                               $this->repositoryDetector->detect($this->root->url())
+        assert(
+                $this->repositoryDetector->detect($this->root->url()),
+                isInstanceOf(SvnRepository::class)
         );
     }
 
@@ -74,8 +78,9 @@ class RepositoryDetectorTestCase extends \PHPUnit_Framework_TestCase
     public function gitFolderResultsInGitRepository()
     {
         vfsStream::newDirectory('.git')->at($this->root);
-        $this->assertInstanceOf(GitRepository::class,
-                               $this->repositoryDetector->detect($this->root->url())
+        assert(
+                $this->repositoryDetector->detect($this->root->url()),
+                isInstanceOf(GitRepository::class)
         );
     }
 
@@ -86,8 +91,9 @@ class RepositoryDetectorTestCase extends \PHPUnit_Framework_TestCase
     {
         vfsStream::newDirectory('.git')->at($this->root);
         vfsStream::newDirectory('.svn')->at($this->root);
-        $this->assertInstanceOf(GitRepository::class,
-                               $this->repositoryDetector->detect($this->root->url())
+        assert(
+                $this->repositoryDetector->detect($this->root->url()),
+                isInstanceOf(GitRepository::class)
         );
     }
 }

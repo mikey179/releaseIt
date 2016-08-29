@@ -9,17 +9,13 @@ declare(strict_types=1);
  * @package  bovigo\releaseit
  */
 namespace bovigo\releaseit;
+use function bovigo\assert\{assert, expect, predicate\equals};
 /**
  * Test for bovigo\releaseit\Series.
  */
 class SeriesTestCase extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * data provider for invalid series numbers
-     *
-     * @return  array
-     */
-    public function getInvalidSeriesNumbers()
+    public function invalidSeriesNumbers(): array
     {
         return [
                 ['foo'],
@@ -28,14 +24,15 @@ class SeriesTestCase extends \PHPUnit_Framework_TestCase
                 ['v1.0.1']
         ];
     }
+
     /**
      * @test
-     * @dataProvider  getInvalidSeriesNumbers
-     * @expectedException  \InvalidArgumentException
+     * @dataProvider  invalidSeriesNumbers
      */
-    public function createWithInvalidSeriesNumberThrowsIllegalArgumentException($invalidNumber)
+    public function createWithInvalidSeriesNumberThrowsInvalidArgumentException(string $invalidNumber)
     {
-        new Series($invalidNumber);
+        expect(function() use ($invalidNumber) { new Series($invalidNumber); })
+                ->throws(\InvalidArgumentException::class);
     }
 
     /**
@@ -43,7 +40,7 @@ class SeriesTestCase extends \PHPUnit_Framework_TestCase
      */
     public function createWithLeadingV()
     {
-        $this->assertEquals('v1.1', (string) new Series('v1.1'));
+        assert((string) new Series('v1.1'), equals('v1.1'));
     }
 
     /**
@@ -51,7 +48,7 @@ class SeriesTestCase extends \PHPUnit_Framework_TestCase
      */
     public function createWithoutLeading()
     {
-        $this->assertEquals('v1.1', (string) new Series('1.1'));
+        assert((string) new Series('1.1'), equals('v1.1'));
     }
 
     /**
@@ -60,7 +57,7 @@ class SeriesTestCase extends \PHPUnit_Framework_TestCase
     public function deliversFirstVersionOfMajorSeries()
     {
         $series = new Series('1');
-        $this->assertEquals(new Version('v1.0.0'), $series->firstVersion());
+        assert($series->firstVersion(), equals(new Version('v1.0.0')));
     }
 
     /**
@@ -69,7 +66,7 @@ class SeriesTestCase extends \PHPUnit_Framework_TestCase
     public function deliversFirstVersionOfMinorSeries()
     {
         $series = new Series('1.1');
-        $this->assertEquals(new Version('v1.1.0'), $series->firstVersion());
+        assert($series->firstVersion(), equals(new Version('v1.1.0')));
     }
 
     /**
@@ -78,7 +75,10 @@ class SeriesTestCase extends \PHPUnit_Framework_TestCase
     public function nextVersionInMajorSeriesIncreasesMinorNumber()
     {
         $series = new Series('1');
-        $this->assertEquals(new Version('v1.2.0'), $series->nextVersion(new Version('v1.1.0')));
+        assert(
+                $series->nextVersion(new Version('v1.1.0')),
+                equals(new Version('v1.2.0'))
+        );
     }
 
     /**
@@ -87,6 +87,9 @@ class SeriesTestCase extends \PHPUnit_Framework_TestCase
     public function nextVersionInMinorSeriesIncreasesPatchLevel()
     {
         $series = new Series('1.1');
-        $this->assertEquals(new Version('v1.1.3'), $series->nextVersion(new Version('v1.1.2')));
+        assert(
+                $series->nextVersion(new Version('v1.1.2')),
+                equals(new Version('v1.1.3'))
+        );
     }
 }

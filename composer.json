@@ -13,7 +13,8 @@
     "require-dev": {
         "bovigo/callmap": "^3.2",
         "mikey179/vfsStream": "^1.6",
-        "phpunit/phpunit": "^5.5"
+        "phpunit/phpunit": "^5.5",
+        "bovigo/assert": "^2.1"
     },
     "autoload": {
         "psr-4": {

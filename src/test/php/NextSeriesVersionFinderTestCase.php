@@ -14,6 +14,7 @@ use bovigo\releaseit\composer\Package;
 use bovigo\releaseit\repository\Repository;
 use stubbles\console\Console;
 
+use function bovigo\assert\{assert, assertNull, predicate\equals};
 use function bovigo\callmap\verify;
 /**
  * Test for bovigo\releaseit\NextSeriesVersionFinder.
@@ -60,7 +61,7 @@ class NextSeriesVersionFinderTestCase extends \PHPUnit_Framework_TestCase
     public function canNotFindVersionIfSeriesCanNotBeDeterminedFromBranch()
     {
         $this->repository->returns(['branch' => 'cool-new-feature']);
-        $this->assertNull($this->nextSeriesVersionFinder->find($this->package, $this->repository));
+        assertNull($this->nextSeriesVersionFinder->find($this->package, $this->repository));
         verify($this->console, 'writeLine')->received(
                 'Can not determine current series for branch cool-new-feature'
         );
@@ -76,7 +77,7 @@ class NextSeriesVersionFinderTestCase extends \PHPUnit_Framework_TestCase
                 'lastReleases' => []
         ]);
         $this->console->returns(['confirm' => false]);
-        $this->assertNull($this->nextSeriesVersionFinder->find($this->package, $this->repository));
+        assertNull($this->nextSeriesVersionFinder->find($this->package, $this->repository));
         verify($this->repository, 'lastReleases')->received(new Series('1.0'));
         verify($this->console, 'writeLine')->received(
                 'No release in series v1.0 yet, determined v1.0.0 as first version number.'
@@ -93,8 +94,9 @@ class NextSeriesVersionFinderTestCase extends \PHPUnit_Framework_TestCase
                 'lastReleases' => []
         ]);
         $this->console->returns(['confirm' => true]);
-        $this->assertEquals(new Version('v1.0.0'),
-                            $this->nextSeriesVersionFinder->find($this->package, $this->repository)
+        assert(
+                $this->nextSeriesVersionFinder->find($this->package, $this->repository),
+                equals(new Version('v1.0.0'))
         );
         verify($this->console, 'writeLine')->received(
                 'No release in series v1.0 yet, determined v1.0.0 as first version number.'
@@ -111,7 +113,7 @@ class NextSeriesVersionFinderTestCase extends \PHPUnit_Framework_TestCase
                 'lastReleases' => ['v1.0.1']
         ]);
         $this->console->returns(['confirm' => false]);
-        $this->assertNull($this->nextSeriesVersionFinder->find($this->package, $this->repository));
+        assertNull($this->nextSeriesVersionFinder->find($this->package, $this->repository));
         verify($this->console, 'writeLine')->received(
                 'Last release in series v1.0 was v1.0.1, determined v1.0.2 as next version number.'
         );
@@ -127,8 +129,9 @@ class NextSeriesVersionFinderTestCase extends \PHPUnit_Framework_TestCase
                 'lastReleases' => ['v1.0.1']
         ]);
         $this->console->returns(['confirm' => true]);
-        $this->assertEquals(new Version('v1.0.2'),
-                            $this->nextSeriesVersionFinder->find($this->package, $this->repository)
+        assert(
+                $this->nextSeriesVersionFinder->find($this->package, $this->repository),
+                equals(new Version('v1.0.2'))
         );
         verify($this->console, 'writeLine')->received(
                 'Last release in series v1.0 was v1.0.1, determined v1.0.2 as next version number.'

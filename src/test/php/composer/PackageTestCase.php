@@ -11,6 +11,13 @@ declare(strict_types=1);
 namespace bovigo\releaseit\composer;
 use bovigo\releaseit\Series;
 use org\bovigo\vfs\vfsStream;
+
+use function bovigo\assert\{
+    assert,
+    assertNull,
+    expect,
+    predicate\equals
+};
 /**
  * Test for bovigo\releaseit\composer\Package.
  */
@@ -18,23 +25,30 @@ class PackageTestCase extends \PHPUnit_Framework_TestCase
 {
     /**
      * @test
-     * @expectedException  bovigo\releaseit\composer\InvalidPackage
      */
     public function createFromNonExistingFileThrowsInvalidPackage()
     {
-        Package::fromFile('doesNotExist.json');
+        expect(function() { Package::fromFile('doesNotExist.json'); })
+                ->throws(InvalidPackage::class);
+    }
+
+    private function composerJson($content): string
+    {
+        return vfsStream::newFile('composer.json')
+                ->withContent($content)
+                ->at(vfsStream::setup())
+                ->url();
     }
 
     /**
      * @test
-     * @expectedException  bovigo\releaseit\composer\InvalidPackage
      */
     public function createFromInvalidJsonFileThrowsInvalidPackage()
     {
-        $file = vfsStream::newFile('composer.json')
-                         ->withContent('invalid')
-                         ->at(vfsStream::setup());
-        Package::fromFile($file->url());
+        $file = $this->composerJson('invalid');
+        expect(function() use ($file) { Package::fromFile($file); })
+                ->throws(InvalidPackage::class);
+
     }
 
     /**
@@ -42,24 +56,21 @@ class PackageTestCase extends \PHPUnit_Framework_TestCase
      */
     public function branchAliasWithoutAnyBranchAliasDefinedReturnsNull()
     {
-        $file = vfsStream::newFile('composer.json')
-                         ->withContent('{}')
-                         ->at(vfsStream::setup());
-        $this->assertNull(Package::fromFile($file->url())
-                                 ->branchAlias('dev-foo')
+        assertNull(
+                Package::fromFile($this->composerJson('{}'))
+                        ->branchAlias('dev-foo')
         );
     }
 
     /**
      * @test
      */
-    public function getNonConfiguredBranchAliasReturnsNull()
+    public function nonConfiguredBranchAliasReturnsNull()
     {
-        $file = vfsStream::newFile('composer.json')
-                         ->withContent('{"extra": { "branch-alias": { "dev-master": "1.0.x-dev"}}}')
-                         ->at(vfsStream::setup());
-        $this->assertNull(Package::fromFile($file->url())
-                                 ->branchAlias('dev-foo')
+        assertNull(
+                Package::fromFile($this->composerJson(
+                        '{"extra": { "branch-alias": { "dev-master": "1.0.x-dev"}}}'
+                ))->branchAlias('dev-foo')
         );
     }
 
@@ -68,12 +79,11 @@ class PackageTestCase extends \PHPUnit_Framework_TestCase
      */
     public function getConfiguredBranchAliasReturnsVersionInfo()
     {
-        $file = vfsStream::newFile('composer.json')
-                         ->withContent('{"extra": { "branch-alias": { "dev-master": "1.0.x-dev"}}}')
-                         ->at(vfsStream::setup());
-        $this->assertEquals('1.0.x-dev',
-                            Package::fromFile($file->url())
-                                   ->branchAlias('dev-master')
+        assert(
+                Package::fromFile($this->composerJson(
+                        '{"extra": { "branch-alias": { "dev-master": "1.0.x-dev"}}}'
+                ))->branchAlias('dev-master'),
+                equals('1.0.x-dev')
         );
     }
 
@@ -82,10 +92,9 @@ class PackageTestCase extends \PHPUnit_Framework_TestCase
      */
     public function seriesWithoutAnyBranchAliasDefinedReturnsNull()
     {
-        $file = vfsStream::newFile('composer.json')
-                         ->withContent('{}')
-                         ->at(vfsStream::setup());
-        $this->assertNull(Package::fromFile($file->url())->series('dev-foo'));
+        assertNull(
+                Package::fromFile($this->composerJson('{}'))->series('dev-foo')
+        );
     }
 
     /**
@@ -93,10 +102,11 @@ class PackageTestCase extends \PHPUnit_Framework_TestCase
      */
     public function seriesForNonConfiguredBranchAliasReturnsNull()
     {
-        $file = vfsStream::newFile('composer.json')
-                         ->withContent('{"extra": { "branch-alias": { "dev-master": "1.0.x-dev"}}}')
-                         ->at(vfsStream::setup());
-        $this->assertNull(Package::fromFile($file->url())->series('dev-foo'));
+        assertNull(
+                Package::fromFile($this->composerJson(
+                        '{"extra": { "branch-alias": { "dev-master": "1.0.x-dev"}}}'
+                ))->series('dev-foo')
+        );
     }
 
     /**
@@ -104,11 +114,11 @@ class PackageTestCase extends \PHPUnit_Framework_TestCase
      */
     public function seriesForConfiguredBranchAlias()
     {
-        $file = vfsStream::newFile('composer.json')
-                         ->withContent('{"extra": { "branch-alias": { "dev-master": "1.0.x-dev"}}}')
-                         ->at(vfsStream::setup());
-        $this->assertEquals(new Series('1.0'),
-                            Package::fromFile($file->url())->series('dev-master')
+        assert(
+                Package::fromFile($this->composerJson(
+                        '{"extra": { "branch-alias": { "dev-master": "1.0.x-dev"}}}'
+                ))->series('dev-master'),
+                equals(new Series('1.0'))
         );
     }
 }

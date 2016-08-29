@@ -15,6 +15,14 @@ use org\bovigo\vfs\vfsStream;
 use stubbles\console\Executor;
 use stubbles\streams\InputStream;
 
+use function bovigo\assert\{
+    assert,
+    assertFalse,
+    assertTrue,
+    expect,
+    predicate\equals,
+    predicate\isSameAs
+};
 use function bovigo\callmap\{verify, throws};
 /**
  * Test for bovigo\releaseit\repository\GitRepository.
@@ -50,28 +58,26 @@ class GitRepositoryTestCase extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
-     * @expectedException  bovigo\releaseit\repository\RepositoryError
-     * @expectedExceptionMessage   Failure while checking git status
      */
     public function isDirtyThrowsRepositoryErrorWhenGitStatusFails()
     {
         $this->executor->returns([
                     'outputOf' => throws(new \RuntimeException('error'))
         ]);
-        $this->gitRepository->isDirty();
+        expect(function() { $this->gitRepository->isDirty(); })
+                ->throws(RepositoryError::class)
+                ->withMessage('Failure while checking git status');
     }
 
     /**
      * @test
-     * @expectedException  bovigo\releaseit\repository\RepositoryError
-     * @expectedExceptionMessage   Current directory is not a git repository
      */
     public function isDirtyThrowsRepositoryErrorWhenCurrentFolderIsNoGitRepository()
     {
-        $this->executor->returns([
-                    'outputOf' => []
-        ]);
-        $this->gitRepository->isDirty();
+        $this->executor->returns(['outputOf' => []]);
+        expect(function() { $this->gitRepository->isDirty(); })
+                ->throws(RepositoryError::class)
+                ->withMessage('Current directory is not a git repository');
     }
 
     /**
@@ -82,7 +88,7 @@ class GitRepositoryTestCase extends \PHPUnit_Framework_TestCase
         $this->executor->returns([
                     'outputOf' => ['# Changes to be committed:']
         ]);
-        $this->assertTrue($this->gitRepository->isDirty());
+        assertTrue($this->gitRepository->isDirty());
     }
 
     /**
@@ -93,7 +99,7 @@ class GitRepositoryTestCase extends \PHPUnit_Framework_TestCase
         $this->executor->returns([
                     'outputOf' => ['nothing to commit, working directory clean']
         ]);
-        $this->assertFalse($this->gitRepository->isDirty());
+        assertFalse($this->gitRepository->isDirty());
     }
 
     /**
@@ -105,35 +111,34 @@ class GitRepositoryTestCase extends \PHPUnit_Framework_TestCase
         $this->executor->returns([
                     'executeAsync' => $inputStream
         ]);
-        $this->assertSame($inputStream,
-                          $this->gitRepository->readStatus()
+        assert(
+                $this->gitRepository->readStatus(),
+                isSameAs($inputStream)
         );
     }
 
     /**
      * @test
-     * @expectedException  bovigo\releaseit\repository\RepositoryError
-     * @expectedExceptionMessage   Failure while retrieving current branch
      */
     public function branchThrowsRepositoryErrorWhenGitBranchFails()
     {
         $this->executor->returns([
                     'outputOf' => throws(new \RuntimeException('error'))
         ]);
-        $this->gitRepository->branch();
+        expect(function() { $this->gitRepository->branch(); })
+                ->throws(RepositoryError::class)
+                ->withMessage('Failure while retrieving current branch');
     }
 
     /**
      * @test
-     * @expectedException  bovigo\releaseit\repository\RepositoryError
-     * @expectedExceptionMessage   Failure while retrieving current branch
      */
     public function branchThrowsRepositoryErrorWhenGitBranchReturnsNoOutput()
     {
-        $this->executor->returns([
-                    'outputOf' => []
-        ]);
-        $this->gitRepository->branch();
+        $this->executor->returns(['outputOf' => []]);
+        expect(function() { $this->gitRepository->branch(); })
+                ->throws(RepositoryError::class)
+                ->withMessage('Failure while retrieving current branch');
     }
 
     /**
@@ -141,25 +146,21 @@ class GitRepositoryTestCase extends \PHPUnit_Framework_TestCase
      */
     public function branchReturnsCurrentBranchName()
     {
-        $this->executor->returns([
-                    'outputOf' => ['* master']
-        ]);
-        $this->assertEquals('master',
-                            $this->gitRepository->branch()
-        );
+        $this->executor->returns(['outputOf' => ['* master']]);
+        assert($this->gitRepository->branch(), equals('master'));
     }
 
     /**
      * @test
-     * @expectedException  bovigo\releaseit\repository\RepositoryError
-     * @expectedExceptionMessage   Failure while retrieving last releases
      */
     public function lastReleasesThrowsRepositoryErrorWhenGitTagFails()
     {
         $this->executor->returns([
                     'outputOf' => throws(new \RuntimeException('error'))
         ]);
-        $this->gitRepository->lastReleases();
+        expect(function() { $this->gitRepository->lastReleases(); })
+                ->throws(RepositoryError::class)
+                ->withMessage('Failure while retrieving last releases');
     }
 
     /**
@@ -167,9 +168,7 @@ class GitRepositoryTestCase extends \PHPUnit_Framework_TestCase
      */
     public function lastReleasesGrepsForTagsStartingWithVWhenNoSeriesGiven()
     {
-        $this->executor->returns([
-                    'outputOf' => ['v1.0.0', 'v1.0.1']
-        ]);
+        $this->executor->returns(['outputOf' => ['v1.0.0', 'v1.0.1']]);
         $this->gitRepository->lastReleases();
         verify($this->executor, 'execute')->received(
                 'git tag -l | grep "v" | sort -r | head -5'
@@ -181,11 +180,10 @@ class GitRepositoryTestCase extends \PHPUnit_Framework_TestCase
      */
     public function lastReleasesReturnsListOfLastReleases()
     {
-        $this->executor->returns([
-                    'outputOf' => ['v1.0.0', 'v1.0.1']
-        ]);
-        $this->assertEquals(['v1.0.0', 'v1.0.1'],
-                            $this->gitRepository->lastReleases(new Series('1.0'), 2)
+        $this->executor->returns(['outputOf' => ['v1.0.0', 'v1.0.1']]);
+        assert(
+                $this->gitRepository->lastReleases(new Series('1.0'), 2),
+                equals(['v1.0.0', 'v1.0.1'])
         );
     }
 
@@ -194,9 +192,7 @@ class GitRepositoryTestCase extends \PHPUnit_Framework_TestCase
      */
     public function lastReleasesGrepsForTagsStartingWithGivenSeries()
     {
-        $this->executor->returns([
-                    'outputOf' => ['v1.0.0', 'v1.0.1']
-        ]);
+        $this->executor->returns(['outputOf' => ['v1.0.0', 'v1.0.1']]);
         $this->gitRepository->lastReleases(new Series('1.0'), 2);
         verify($this->executor, 'execute')->received(
                 'git tag -l | grep "v1.0" | sort -r | head -2'
@@ -205,15 +201,17 @@ class GitRepositoryTestCase extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
-     * @expectedException  bovigo\releaseit\repository\RepositoryError
-     * @expectedExceptionMessage   Failure while creating release
      */
     public function createReleaseThrowsRepositoryErrorWhenGitTagFails()
     {
         $this->executor->returns([
                     'outputOf' => throws(new \RuntimeException('error'))
         ]);
-        $this->gitRepository->createRelease(new Version('1.1.0'));
+        expect(function() {
+                $this->gitRepository->createRelease(new Version('1.1.0'));
+        })
+                ->throws(RepositoryError::class)
+                ->withMessage('Failure while creating release');
     }
 
     /**
@@ -231,8 +229,9 @@ class GitRepositoryTestCase extends \PHPUnit_Framework_TestCase
         $this->executor->returns([
                     'outputOf' => $gitTagOutput
         ]);
-        $this->assertEquals($gitTagOutput,
-                            $this->gitRepository->createRelease(new Version('1.1.0'))
+        assert(
+                $this->gitRepository->createRelease(new Version('1.1.0')),
+                equals($gitTagOutput)
         );
     }
 }
