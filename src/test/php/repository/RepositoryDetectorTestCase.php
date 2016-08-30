@@ -60,37 +60,9 @@ class RepositoryDetectorTestCase extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function svnFolderResultsInSvnRepository()
-    {
-        vfsStream::newDirectory('.svn')->at($this->root);
-        $this->executor->returns([
-                    'outputOf' => ['URL: http://svn.example.org/svn/foo/trunk']
-        ]);
-        assert(
-                $this->repositoryDetector->detect($this->root->url()),
-                isInstanceOf(SvnRepository::class)
-        );
-    }
-
-    /**
-     * @test
-     */
     public function gitFolderResultsInGitRepository()
     {
         vfsStream::newDirectory('.git')->at($this->root);
-        assert(
-                $this->repositoryDetector->detect($this->root->url()),
-                isInstanceOf(GitRepository::class)
-        );
-    }
-
-    /**
-     * @test
-     */
-    public function gitAndSvnFolderResultsInGitRepository()
-    {
-        vfsStream::newDirectory('.git')->at($this->root);
-        vfsStream::newDirectory('.svn')->at($this->root);
         assert(
                 $this->repositoryDetector->detect($this->root->url()),
                 isInstanceOf(GitRepository::class)

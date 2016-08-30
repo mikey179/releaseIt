@@ -43,8 +43,6 @@ class RepositoryDetector
     {
         if (file_exists($path . DIRECTORY_SEPARATOR . '.git')) {
             return new GitRepository($this->executor);
-        } elseif (file_exists($path . DIRECTORY_SEPARATOR . '.svn')) {
-            return new SvnRepository($this->executor);
         }
 
         return new NoRepository();
