@@ -30,7 +30,7 @@ interface Repository
      *
      * @return  InputStream
      */
-    public function readStatus(): InputStream;
+    public function status(): InputStream;
 
     /**
      * returns branch of repository

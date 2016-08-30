@@ -6,7 +6,7 @@
     "description": "Helps to create releases from current checkout",
     "require": {
         "php": "^7.0",
-        "stubbles/console": "^7.0.1",
+        "stubbles/console": "^7.1",
         "hampel/json": "^2.3"
     },
     "require-dev": {

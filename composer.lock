@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "434348abb2278533722fb088d55fea7e",
-    "content-hash": "2e880d35651f8f1e64cdf172b258918e",
+    "hash": "4c814db3d686e4e07a062c2f57ec2a07",
+    "content-hash": "58c3d3223afa6100269af4e969f6c0c2",
     "packages": [
         {
             "name": "hampel/json",
@@ -55,16 +55,16 @@
         },
         {
             "name": "stubbles/console",
-            "version": "v7.0.1",
+            "version": "v7.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/stubbles/stubbles-console.git",
-                "reference": "5b436a3f5babc4affdc1859cf6e6e3e6d150daf4"
+                "reference": "9b8d8e0d92e3c6b629a0fa860ace957016d20047"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/stubbles/stubbles-console/zipball/5b436a3f5babc4affdc1859cf6e6e3e6d150daf4",
-                "reference": "5b436a3f5babc4affdc1859cf6e6e3e6d150daf4",
+                "url": "https://api.github.com/repos/stubbles/stubbles-console/zipball/9b8d8e0d92e3c6b629a0fa860ace957016d20047",
+                "reference": "9b8d8e0d92e3c6b629a0fa860ace957016d20047",
                 "shasum": ""
             },
             "require": {
@@ -72,14 +72,14 @@
                 "stubbles/input": "^7.0",
                 "stubbles/ioc": "^8.0.1",
                 "stubbles/reflect": "^8.0",
-                "stubbles/streams": "^8.0",
+                "stubbles/streams": "^8.1",
                 "stubbles/values": "^8.1"
             },
             "require-dev": {
-                "bovigo/assert": "^2.0",
-                "bovigo/callmap": "^3.1",
+                "bovigo/assert": "^2.1",
+                "bovigo/callmap": "^3.2",
                 "mikey179/vfsstream": "^1.6",
-                "phpunit/phpunit": "^5.4"
+                "phpunit/phpunit": "^5.5"
             },
             "bin": [
                 "bin/createConsoleApp"
@@ -87,7 +87,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "7.0.x-dev"
+                    "dev-master": "7.1.x-dev"
                 }
             },
             "autoload": {
@@ -101,7 +101,7 @@
             ],
             "description": "Stubbles package to build command line apps.",
             "homepage": "http://stubbles.net/",
-            "time": "2016-08-29 14:14:07"
+            "time": "2016-08-30 20:43:53"
         },
         {
             "name": "stubbles/input",
@@ -291,27 +291,27 @@
         },
         {
             "name": "stubbles/streams",
-            "version": "v8.0.0",
+            "version": "v8.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/stubbles/stubbles-streams.git",
-                "reference": "8fae2ecf6fa6e0e77a5e81c3a90c3b25a71c9bf5"
+                "reference": "99b0dace5fcf71584d1456b4b5408017b896bdf5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/stubbles/stubbles-streams/zipball/8fae2ecf6fa6e0e77a5e81c3a90c3b25a71c9bf5",
-                "reference": "8fae2ecf6fa6e0e77a5e81c3a90c3b25a71c9bf5",
+                "url": "https://api.github.com/repos/stubbles/stubbles-streams/zipball/99b0dace5fcf71584d1456b4b5408017b896bdf5",
+                "reference": "99b0dace5fcf71584d1456b4b5408017b896bdf5",
                 "shasum": ""
             },
             "require": {
                 "php": "^7.0"
             },
             "require-dev": {
-                "bovigo/assert": "^2.0",
-                "bovigo/callmap": "3.0",
+                "bovigo/assert": "^2.1",
+                "bovigo/callmap": "3.2",
                 "ext-iconv": "*",
                 "mikey179/vfsstream": "^1.6",
-                "phpunit/phpunit": "^5.4",
+                "phpunit/phpunit": "^5.5",
                 "stubbles/reflect": "^8.0",
                 "stubbles/sequence": "^8.1"
             },
@@ -322,7 +322,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "8.0.x-dev"
+                    "dev-master": "8.1.x-dev"
                 }
             },
             "autoload": {
@@ -339,7 +339,7 @@
             ],
             "description": "Input- and OutputStreams.",
             "homepage": "http://stubbles.net/",
-            "time": "2016-07-20 15:29:54"
+            "time": "2016-08-30 20:10:51"
         },
         {
             "name": "stubbles/values",

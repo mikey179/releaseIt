@@ -13,7 +13,7 @@ use bovigo\callmap\NewInstance;
 use bovigo\releaseit\repository\{Repository, RepositoryDetector};
 use stubbles\console\Console;
 use stubbles\input\ValueReader;
-use stubbles\streams\InputStream;
+use stubbles\streams\{InputStream, memory\MemoryInputStream};
 use stubbles\values\Rootpath;
 use org\bovigo\vfs\vfsStream;
 
@@ -174,16 +174,13 @@ class ReleaseItTestCase extends \PHPUnit_Framework_TestCase
      */
     public function stopsWithExitCode22IfRepositoryIsDirty()
     {
-        $repositoryStatus = NewInstance::of(InputStream::class)->returns([
-                'readLine' => 'A  foo.php',
-                'eof'      => onConsecutiveCalls(false, true)
-        ]);
+        $repositoryStatus = new MemoryInputStream('A  foo.php');
         $repository = $this->createRepository()->returns([
-                'isDirty'    => true,
-                'readStatus' => $repositoryStatus
+                'isDirty' => true,
+                'status'  => $repositoryStatus
         ]);
         assert($this->releaseIt->run(), equals(22));
-        verify($this->console, 'writeErrorLine')->receivedOn(2, 'A  foo.php');
+        verify($this->console, 'writeError')->received($repositoryStatus);
     }
 
     /**

@@ -70,7 +70,7 @@ class GitRepository implements Repository
      *
      * @return  InputStream
      */
-    public function readStatus(): InputStream
+    public function status(): InputStream
     {
         return $this->executor->executeAsync('git -C ' . $this->path . ' status');
     }

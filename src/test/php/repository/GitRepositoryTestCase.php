@@ -97,14 +97,14 @@ class GitRepositoryTestCase extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function readStatusReturnsInputStreamToReadResultFrom()
+    public function statusReturnsInputStreamToReadResultFrom()
     {
         $inputStream = NewInstance::of(InputStream::class);
         $this->executor->returns([
                     'executeAsync' => $inputStream
         ]);
         assert(
-                $this->gitRepository->readStatus(),
+                $this->gitRepository->status(),
                 isSameAs($inputStream)
         );
     }

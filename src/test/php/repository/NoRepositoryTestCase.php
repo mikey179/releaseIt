@@ -50,10 +50,10 @@ class NoRepositoryTestCase extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function readStatusReturnsInputStreamWithOneLine()
+    public function statusReturnsInputStreamWithOneLine()
     {
         assert(
-                $this->noRepository->readStatus()->readLine(),
+                $this->noRepository->status()->readLine(),
                 equals('Current directory is not a known type of repository')
         );
     }

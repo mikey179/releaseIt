@@ -34,7 +34,7 @@ class NoRepository implements Repository
      *
      * @return  InputStream
      */
-    public function readStatus(): InputStream
+    public function status(): InputStream
     {
         return new MemoryInputStream(
                 'Current directory is not a known type of repository'

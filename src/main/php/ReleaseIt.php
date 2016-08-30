@@ -10,7 +10,7 @@ declare(strict_types=1);
  */
 namespace bovigo\releaseit;
 use bovigo\releaseit\composer\{InvalidPackage, Package};
-use bovigo\releaseit\repository\{Repository, RepositoryDetector};
+use bovigo\releaseit\repository\RepositoryDetector;
 use stubbles\console\{Console, ConsoleApp};
 use stubbles\ioc\Binder;
 /**
@@ -126,7 +126,9 @@ class ReleaseIt extends ConsoleApp
         }
 
         $repository = $this->repoDetector->detect($this->cwd);
-        if ($this->isDirty($repository)) {
+        if ($repository->isDirty()) {
+            $this->console->writeErrorLine('Can\'t create release, working directory not clean.')
+                    ->writeError($repository->status());
             return 22;
         }
 
@@ -141,27 +143,6 @@ class ReleaseIt extends ConsoleApp
         $this->console->writeLines($repository->createRelease($version, $this->signingKey()))
                 ->writeLine('Successfully created release ' . $version);
         return 0;
-    }
-
-    /**
-     * checks if repository is dirty
-     *
-     * @param   Repository  $repository
-     * @return  bool
-     */
-    private function isDirty(Repository $repository): bool
-    {
-        if ($repository->isDirty()) {
-            $this->console->writeErrorLine('Can\'t create release, working directory not clean.');
-            $repositoryStatus = $repository->readStatus();
-            while (!$repositoryStatus->eof()) {
-                $this->console->writeErrorLine($repositoryStatus->readLine());
-            }
-
-            return true;
-        }
-
-        return false;
     }
 
     /**
