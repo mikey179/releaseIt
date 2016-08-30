@@ -21,7 +21,8 @@ use function bovigo\assert\{
     assert,
     assertTrue,
     predicate\equals,
-    predicate\isInstanceOf
+    predicate\isInstanceOf,
+    predicate\startsWith
 };
 use function bovigo\callmap\{verify, onConsecutiveCalls};
 use function stubbles\reflect\annotationsOf;
@@ -63,7 +64,8 @@ class ReleaseItTestCase extends \PHPUnit_Framework_TestCase
                 $this->console,
                 $this->repoDetector,
                 $this->versionFinder,
-                $root->url()
+                $root->url(),
+                []
         );
     }
 
@@ -77,6 +79,74 @@ class ReleaseItTestCase extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
+     * @since  2.0.0
+     */
+    public function printsUsageWhenRequestedWithH()
+    {
+        $releaseIt = new ReleaseIt(
+                $this->console,
+                $this->repoDetector,
+                $this->versionFinder,
+                vfsStream::setup()->url(),
+                ['h' => false]
+        );
+        assert($releaseIt->run(), equals(0));
+        verify($this->console, 'writeLine')->received(startsWith('Usage'));
+    }
+
+    /**
+     * @test
+     * @since  2.0.0
+     */
+    public function printsUsageWhenRequestedWithHelp()
+    {
+        $releaseIt = new ReleaseIt(
+                $this->console,
+                $this->repoDetector,
+                $this->versionFinder,
+                vfsStream::setup()->url(),
+                ['help' => false]
+        );
+        assert($releaseIt->run(), equals(0));
+        verify($this->console, 'writeLine')->received(startsWith('Usage'));
+    }
+
+    /**
+     * @test
+     * @since  2.0.0
+     */
+    public function printsVersionWhenRequestedWithV()
+    {
+        $releaseIt = new ReleaseIt(
+                $this->console,
+                $this->repoDetector,
+                $this->versionFinder,
+                vfsStream::setup()->url(),
+                ['v' => false]
+        );
+        assert($releaseIt->run(), equals(0));
+        verify($this->console, 'writeLine')->received(startsWith('ReleaseIt v'));
+    }
+
+    /**
+     * @test
+     * @since  2.0.0
+     */
+    public function printsVersionWhenRequestedWithVersion()
+    {
+        $releaseIt = new ReleaseIt(
+                $this->console,
+                $this->repoDetector,
+                $this->versionFinder,
+                vfsStream::setup()->url(),
+                ['version' => false]
+        );
+        assert($releaseIt->run(), equals(0));
+        verify($this->console, 'writeLine')->received(startsWith('ReleaseIt v'));
+    }
+
+    /**
+     * @test
      */
     public function stopsWithExitCode21IfComposerJsonIsMissing()
     {
@@ -84,7 +154,8 @@ class ReleaseItTestCase extends \PHPUnit_Framework_TestCase
                 $this->console,
                 $this->repoDetector,
                 $this->versionFinder,
-                vfsStream::setup()->url()
+                vfsStream::setup()->url(),
+                []
         );
         assert($releaseIt->run(), equals(21));
         verify($this->console, 'writeErrorLine')->wasCalledOnce();

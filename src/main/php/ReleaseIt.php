@@ -44,6 +44,12 @@ class ReleaseIt extends ConsoleApp
      * @type  string
      */
     private $cwd;
+    /**
+     * command line arguments
+     *
+     * @type  array
+     */
+    private $args;
 
     /**
      * returns list of bindings used for this application
@@ -53,7 +59,7 @@ class ReleaseIt extends ConsoleApp
     public static function __bindings(): array
     {
         return [
-                self::argumentParser(),
+                self::argumentParser()->withOptions('hv')->withLongOptions(['help', 'version']),
                 self::currentWorkingDirectory(),
                 function(Binder $binder)
                 {
@@ -71,18 +77,22 @@ class ReleaseIt extends ConsoleApp
      * @param  RepositoryDetector  $repoDetector
      * @param  VersionFinder       $versionFinder
      * @param  string              $cwd
+     * @param  array               $args
      * @Named{cwd}('stubbles.cwd')
+     * @Named{args}('argv')
      */
     public function __construct(
             Console $console,
             RepositoryDetector $repoDetector,
             VersionFinder $versionFinder,
-            $cwd
+            $cwd,
+            array $args
     ) {
         $this->console       = $console;
         $this->repoDetector  = $repoDetector;
         $this->versionFinder = $versionFinder;
         $this->cwd           = $cwd;
+        $this->args          = $args;
     }
 
     /**
@@ -92,6 +102,20 @@ class ReleaseIt extends ConsoleApp
      */
     public function run(): int
     {
+        if (isset($this->args['h']) || isset($this->args['help'])) {
+            $this->console->writeLine('Usage: ' . basename($_SERVER['argv']['0']) . ' [options]');
+            $this->console->writeEmptyLine();
+            $this->console->writeLine('Options:');
+            $this->console->writeLine(' -h|--help      Print this usage info.');
+            $this->console->writeLine(' -v|--version   Print current version.');
+            $this->console->writeEmptyLine();
+            return 0;
+        } elseif (isset($this->args['v']) || isset($this->args['version'])) {
+            $this->console->writeLine('ReleaseIt v2.0.0 by Frank Kleine, (c) 2012-2016');
+            $this->console->writeEmptyLine();
+            return 0;
+        }
+
         try {
             $package = Package::fromFile($this->cwd . DIRECTORY_SEPARATOR . 'composer.json');
         } catch (InvalidPackage $ip) {
