@@ -59,7 +59,7 @@ class ReleaseIt extends ConsoleApp
     public static function __bindings(): array
     {
         return [
-                self::argumentParser()->withOptions('hv')->withLongOptions(['help', 'version']),
+                self::argumentParser()->withOptions('hvsu:')->withLongOptions(['help', 'version']),
                 self::currentWorkingDirectory(),
                 function(Binder $binder)
                 {
