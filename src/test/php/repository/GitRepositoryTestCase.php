@@ -10,7 +10,7 @@ declare(strict_types=1);
  */
 namespace bovigo\releaseit\repository;
 use bovigo\callmap\NewInstance;
-use bovigo\releaseit\{Series, Version};
+use bovigo\releaseit\{Key, Series, Version};
 use stubbles\console\Executor;
 use stubbles\streams\InputStream;
 
@@ -248,6 +248,48 @@ class GitRepositoryTestCase extends \PHPUnit_Framework_TestCase
         assert(
                 $this->gitRepository->createRelease(new Version('1.1.0')),
                 equals($gitTagOutput)
+        );
+    }
+
+    /**
+     * @test
+     * @group  issue_11
+     * @since  2.0.0
+     */
+    public function createReleaseDoesNotSignReleaseWhenNoKeyProvided()
+    {
+        $this->executor->returns(['outputOf' => []]);
+        $this->gitRepository->createRelease(new Version('1.1.0'));
+        verify($this->executor, 'execute')->received(
+                'git -C ' . __DIR__ . ' tag -a v1.1.0 -m "tag release v1.1.0" && git push --tags'
+        );
+    }
+
+    /**
+     * @test
+     * @group  issue_11
+     * @since  2.0.0
+     */
+    public function createReleaseUsesDefaultKeyWhenNoKeyIdSpecified()
+    {
+        $this->executor->returns(['outputOf' => []]);
+        $this->gitRepository->createRelease(new Version('1.1.0'), Key::default());
+        verify($this->executor, 'execute')->received(
+                'git -C ' . __DIR__ . ' tag -s -a v1.1.0 -m "tag release v1.1.0" && git push --tags'
+        );
+    }
+
+    /**
+     * @test
+     * @group  issue_11
+     * @since  2.0.0
+     */
+    public function createReleaseUsesGivenKeyWhenKeyIdSpecified()
+    {
+        $this->executor->returns(['outputOf' => []]);
+        $this->gitRepository->createRelease(new Version('1.1.0'), new Key('abc123'));
+        verify($this->executor, 'execute')->received(
+                'git -C ' . __DIR__ . ' tag -u abc123 -a v1.1.0 -m "tag release v1.1.0" && git push --tags'
         );
     }
 }

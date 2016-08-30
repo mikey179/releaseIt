@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @package  bovigo\releaseit
  */
 namespace bovigo\releaseit\repository;
+use bovigo\releaseit\Key;
 use bovigo\releaseit\Series;
 use bovigo\releaseit\Version;
 use stubbles\streams\InputStream;
@@ -66,10 +67,11 @@ class NoRepository implements Repository
      * creates a release with given version number
      *
      * @param   Version  $version
+     * @param   Key      $key      optional  by passing a key the release will be signed
      * @return  string[]
      * @throws  RepositoryError
      */
-    public function createRelease(Version $version): array
+    public function createRelease(Version $version, Key $key = null): array
     {
         throw new RepositoryError(
                 'Can\'t create release here, is not a known repository'

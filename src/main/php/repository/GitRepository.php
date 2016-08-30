@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @package  bovigo\releaseit
  */
 namespace bovigo\releaseit\repository;
+use bovigo\releaseit\Key;
 use bovigo\releaseit\Series;
 use bovigo\releaseit\Version;
 use stubbles\console\Executor;
@@ -115,12 +116,14 @@ class GitRepository implements Repository
      * creates a release with given version number
      *
      * @param   Version  $version
+     * @param   Key      $key      optional  by passing a key the tag for the release will be signed
      * @return  string[]
      */
-    public function createRelease(Version $version): array
+    public function createRelease(Version $version, Key $key = null): array
     {
+        $sign = null === $key ? '' : ($key->isDefault() ? ' -s' : ' -u ' . $key);
         return $this->outputOf(
-                'git -C ' . $this->path . ' tag -a ' . $version . ' -m "tag release ' . $version
+                'git -C ' . $this->path . ' tag' . $sign . ' -a ' . $version . ' -m "tag release ' . $version
                 . '" && git push --tags',
                 'Failure while creating release'
         );

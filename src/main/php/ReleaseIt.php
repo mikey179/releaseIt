@@ -108,6 +108,8 @@ class ReleaseIt extends ConsoleApp
             $this->console->writeLine('Options:');
             $this->console->writeLine(' -h|--help      Print this usage info.');
             $this->console->writeLine(' -v|--version   Print current version.');
+            $this->console->writeLine(' -s             Create signed release, using the default e-mail address\'s key.');
+            $this->console->writeLine(' -u <keyid>     Create signed release, using the given key.');
             $this->console->writeEmptyLine();
             return 0;
         } elseif (isset($this->args['v']) || isset($this->args['version'])) {
@@ -136,8 +138,8 @@ class ReleaseIt extends ConsoleApp
             return 23;
         }
 
-        $this->console->writeLines($repository->createRelease($version))
-                      ->writeLine('Successfully created release ' . $version);
+        $this->console->writeLines($repository->createRelease($version, $this->signingKey()))
+                ->writeLine('Successfully created release ' . $version);
         return 0;
     }
 
@@ -160,5 +162,21 @@ class ReleaseIt extends ConsoleApp
         }
 
         return false;
+    }
+
+    /**
+     * creates key to use for signing the release
+     *
+     * @return  Key
+     */
+    private function signingKey()
+    {
+        if (isset($this->args['s'])) {
+            return Key::default();
+        } elseif (isset($this->args['u'])) {
+            return new Key($this->args['u']);
+        }
+
+        return null;
     }
 }

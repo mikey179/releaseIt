@@ -221,6 +221,71 @@ class ReleaseItTestCase extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
+     * @group  issue_11
+     * @since  2.0.0
+     */
+    public function createsUnsignedReleaseWhenNoSigningRequested()
+    {
+        $repository = $this->createRepository()->returns([
+                'isDirty'       => false,
+                'createRelease' => ['foo', 'bar']
+        ]);
+        $version = new Version('v1.1.0');
+        $this->versionFinder->returns(['find' => $version]);
+        assert($this->releaseIt->run(), equals(0));
+        verify($repository, 'createRelease')->received($version, null);
+    }
+
+    /**
+     * @test
+     * @group  issue_11
+     * @since  2.0.0
+     */
+    public function createsSignedReleaseWhenSigningWithDefaultKeyRequested()
+    {
+        $repository = $this->createRepository()->returns([
+                'isDirty'       => false,
+                'createRelease' => ['foo', 'bar']
+        ]);
+        $version = new Version('v1.1.0');
+        $this->versionFinder->returns(['find' => $version]);
+        $releaseIt = new ReleaseIt(
+                $this->console,
+                $this->repoDetector,
+                $this->versionFinder,
+                vfsStream::url('root'),
+                ['s' => false]
+        );
+        assert($releaseIt->run(), equals(0));
+        verify($repository, 'createRelease')->received($version, Key::default());
+    }
+
+    /**
+     * @test
+     * @group  issue_11
+     * @since  2.0.0
+     */
+    public function createsSignedReleaseWhenSigningWithKeyRequested()
+    {
+        $repository = $this->createRepository()->returns([
+                'isDirty'       => false,
+                'createRelease' => ['foo', 'bar']
+        ]);
+        $version = new Version('v1.1.0');
+        $this->versionFinder->returns(['find' => $version]);
+        $releaseIt = new ReleaseIt(
+                $this->console,
+                $this->repoDetector,
+                $this->versionFinder,
+                vfsStream::url('root'),
+                ['u' => 'abc123']
+        );
+        assert($releaseIt->run(), equals(0));
+        verify($repository, 'createRelease')->received($version, new Key('abc123'));
+    }
+
+    /**
+     * @test
      */
     public function canCreateInstance()
     {
