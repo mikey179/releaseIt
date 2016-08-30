@@ -151,8 +151,8 @@ class GitRepositoryTestCase extends \PHPUnit_Framework_TestCase
     public function branches(): array
     {
         return [
-                ['single line'          => ['* master']],
-                ['multi line, issue #7' => ['feature/foo', '* master', 'bug/fix']]
+                'single line'          => [['* master']],
+                'multi line, issue #7' => [['feature/foo', '* master', 'bug/fix']]
         ];
     }
 
