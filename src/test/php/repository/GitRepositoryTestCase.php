@@ -11,7 +11,6 @@ declare(strict_types=1);
 namespace bovigo\releaseit\repository;
 use bovigo\callmap\NewInstance;
 use bovigo\releaseit\{Series, Version};
-use org\bovigo\vfs\vfsStream;
 use stubbles\console\Executor;
 use stubbles\streams\InputStream;
 
@@ -39,12 +38,6 @@ class GitRepositoryTestCase extends \PHPUnit_Framework_TestCase
      * @type  Executor
      */
     private $executor;
-    /**
-     * root path
-     *
-     * @type  org\bovigo\vfs\vfsStreamDirectory
-     */
-    private $root;
 
     /**
      * set up test environment
@@ -52,8 +45,7 @@ class GitRepositoryTestCase extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->executor      = NewInstance::of(Executor::class);
-        $this->gitRepository = new GitRepository($this->executor);
-        $this->root          = vfsStream::setup();
+        $this->gitRepository = new GitRepository(__DIR__, $this->executor);
     }
 
     /**
@@ -195,7 +187,7 @@ class GitRepositoryTestCase extends \PHPUnit_Framework_TestCase
         $this->executor->returns(['outputOf' => ['v1.0.0', 'v1.0.1']]);
         $this->gitRepository->lastReleases();
         verify($this->executor, 'execute')->received(
-                'git tag -l | grep "v" | sort -r | head -5'
+                'git -C ' . __DIR__ . ' tag -l | grep "v" | sort -r | head -5'
         );
     }
 
@@ -219,7 +211,7 @@ class GitRepositoryTestCase extends \PHPUnit_Framework_TestCase
         $this->executor->returns(['outputOf' => ['v1.0.0', 'v1.0.1']]);
         $this->gitRepository->lastReleases(new Series('1.0'), 2);
         verify($this->executor, 'execute')->received(
-                'git tag -l | grep "v1.0" | sort -r | head -2'
+                'git -C ' . __DIR__ . ' tag -l | grep "v1.0" | sort -r | head -2'
         );
     }
 

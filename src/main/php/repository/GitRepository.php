@@ -21,6 +21,12 @@ use function stubbles\console\collect;
 class GitRepository implements Repository
 {
     /**
+     * path where git repository is located
+     *
+     * @type  string
+     */
+    private $path;
+    /**
      * executor for command line commands
      *
      * @type  Executor
@@ -30,10 +36,12 @@ class GitRepository implements Repository
     /**
      * constructor
      *
+     * @param  string    $path
      * @param  Executor  $executor
      */
-    public function __construct(Executor $executor)
+    public function __construct(string $path, Executor $executor)
     {
+        $this->path     = $path;
         $this->executor = $executor;
     }
 
@@ -46,7 +54,7 @@ class GitRepository implements Repository
     public function isDirty(): bool
     {
         $output = $this->outputOf(
-                'git status 2> /dev/null | tail -n1',
+                'git -C ' . $this->path . ' status 2> /dev/null | tail -n1',
                 'Failure while checking git status'
         );
         if (!isset($output[0])) {
@@ -63,7 +71,7 @@ class GitRepository implements Repository
      */
     public function readStatus(): InputStream
     {
-        return $this->executor->executeAsync('git status');
+        return $this->executor->executeAsync('git -C ' . $this->path . ' status');
     }
 
     /**
@@ -74,7 +82,7 @@ class GitRepository implements Repository
      */
     public function branch(): string
     {
-        $branches = $this->outputOf('git branch', 'Failure while retrieving current branch');
+        $branches = $this->outputOf('git -C ' . $this->path . ' branch', 'Failure while retrieving current branch');
         foreach ($branches as $branch) {
             if ('*' === $branch{0}) {
                 return substr($branch, 2);
@@ -98,7 +106,7 @@ class GitRepository implements Repository
         }
 
         return $this->outputOf(
-                'git tag -l | grep "' . $series . '" | sort -r | head -' . $amount,
+                'git -C ' . $this->path . ' tag -l | grep "' . $series . '" | sort -r | head -' . $amount,
                 'Failure while retrieving last releases'
         );
     }
@@ -112,7 +120,7 @@ class GitRepository implements Repository
     public function createRelease(Version $version): array
     {
         return $this->outputOf(
-                'git tag -a ' . $version . ' -m "tag release ' . $version
+                'git -C ' . $this->path . ' tag -a ' . $version . ' -m "tag release ' . $version
                 . '" && git push --tags',
                 'Failure while creating release'
         );

@@ -42,7 +42,7 @@ class RepositoryDetector
     public function detect(string $path): Repository
     {
         if (file_exists($path . DIRECTORY_SEPARATOR . '.git')) {
-            return new GitRepository($this->executor);
+            return new GitRepository($path, $this->executor);
         }
 
         return new NoRepository();
