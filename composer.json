@@ -7,7 +7,6 @@
     "require": {
         "php": "^7.0",
         "stubbles/console": "^7.0.1",
-        "herrera-io/version": "^1.0",
         "hampel/json": "^2.3"
     },
     "require-dev": {

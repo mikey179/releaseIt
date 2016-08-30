@@ -6,15 +6,34 @@ declare(strict_types=1);
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
+ * Version number validation ported from abondoned package herrera-io/version,
+ * Copyright (c) 2013 Kevin Herrera and licensed under MIT
+ * https://github.com/kherge-abandoned/php-version/blob/master/LICENSE
+ *
  * @package  bovigo\releaseit
  */
 namespace bovigo\releaseit;
-use Herrera\Version\Validator;
 /**
  * Represents a version number.
  */
 class Version
 {
+    /**
+     * The regular expression for a valid semantic version number.
+     */
+    const VALIDATE = '/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?$/';
+
+    /**
+     * Checks if the string representation of a version number is valid.
+     *
+     * @param   string  $version  The string representation.
+     * @return  bool    TRUE if the string representation is valid, FALSE if not.
+     */
+    public static function isValid(string $version): bool
+    {
+        return (true == preg_match(self::VALIDATE, self::stripLeadingV($version)));
+    }
+
     /**
      * actual version number
      *
@@ -30,8 +49,8 @@ class Version
      */
     public function __construct(string $number)
     {
-        $this->number = $this->stripLeadingV($number);
-        if (!Validator::isVersion($this->number)) {
+        $this->number = self::stripLeadingV($number);
+        if (!self::isValid($this->number)) {
             throw new \InvalidArgumentException(
                     'Given value ' . $number . ' is not a valid version number'
             );
@@ -44,7 +63,7 @@ class Version
      * @param   string  $value
      * @return  string
      */
-    private function stripLeadingV(string $value): string
+    private static function stripLeadingV(string $value): string
     {
         if (substr($value, 0, 1) === 'v') {
             return substr($value, 1);

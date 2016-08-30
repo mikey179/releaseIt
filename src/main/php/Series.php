@@ -9,7 +9,6 @@ declare(strict_types=1);
  * @package  bovigo\releaseit
  */
 namespace bovigo\releaseit;
-use Herrera\Version\Validator;
 /**
  * Represents a series of versions.
  */
@@ -49,7 +48,7 @@ class Series
     {
         $this->number = $this->stripLeadingV($number);
         $this->type   = $this->calculateSeriesType($number);
-        if (self::TYPE_UNKNOWN === $this->type || !Validator::isVersion($this->appendedNumber())) {
+        if (self::TYPE_UNKNOWN === $this->type || !Version::isValid($this->appendedNumber())) {
             throw new \InvalidArgumentException(
                     'Given value ' . $number . ' is not a valid series number'
             );
