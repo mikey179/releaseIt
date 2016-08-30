@@ -138,15 +138,39 @@ class GitRepositoryTestCase extends \PHPUnit_Framework_TestCase
         $this->executor->returns(['outputOf' => []]);
         expect(function() { $this->gitRepository->branch(); })
                 ->throws(RepositoryError::class)
-                ->withMessage('Failure while retrieving current branch');
+                ->withMessage('Failure while retrieving current branch: no branches available');
     }
 
     /**
      * @test
+     * @since  2.0.0
      */
-    public function branchReturnsCurrentBranchName()
+    public function branchThrowsRepositoryErrorWhenGitBranchReturnsBranchesWithoutSelection()
     {
-        $this->executor->returns(['outputOf' => ['* master']]);
+        $this->executor->returns(['outputOf' => ['master', 'feature/foo', 'bug/fix']]);
+        expect(function() { $this->gitRepository->branch(); })
+                ->throws(RepositoryError::class)
+                ->withMessage('Failure while retrieving current branch: no branches available');
+    }
+
+    /**
+     * @since  2.0.0
+     */
+    public function branches(): array
+    {
+        return [
+                ['single line'          => ['* master']],
+                ['multi line, issue #7' => ['feature/foo', '* master', 'bug/fix']]
+        ];
+    }
+
+    /**
+     * @test
+     * @dataProvider  branches
+     */
+    public function branchReturnsCurrentBranchName(array $output)
+    {
+        $this->executor->returns(['outputOf' => $output]);
         assert($this->gitRepository->branch(), equals('master'));
     }
 

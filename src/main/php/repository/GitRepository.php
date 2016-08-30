@@ -9,10 +9,10 @@ declare(strict_types=1);
  * @package  bovigo\releaseit
  */
 namespace bovigo\releaseit\repository;
-use stubbles\console\Executor;
-use stubbles\streams\InputStream;
 use bovigo\releaseit\Series;
 use bovigo\releaseit\Version;
+use stubbles\console\Executor;
+use stubbles\streams\InputStream;
 
 use function stubbles\console\collect;
 /**
@@ -45,7 +45,7 @@ class GitRepository implements Repository
      */
     public function isDirty(): bool
     {
-        $output = $this->execute(
+        $output = $this->outputOf(
                 'git status 2> /dev/null | tail -n1',
                 'Failure while checking git status'
         );
@@ -67,18 +67,21 @@ class GitRepository implements Repository
     }
 
     /**
-     * returns branch of repository
+     * returns current branch of repository
      *
      * @return  string
+     * @throws  RepositoryError
      */
     public function branch(): string
     {
-        $output = $this->execute('git branch', 'Failure while retrieving current branch');
-        if (!isset($output[0])) {
-            throw new RepositoryError('Failure while retrieving current branch');
+        $branches = $this->outputOf('git branch', 'Failure while retrieving current branch');
+        foreach ($branches as $branch) {
+            if ('*' === $branch{0}) {
+                return substr($branch, 2);
+            }
         }
 
-        return substr($output[0], 2);
+        throw new RepositoryError('Failure while retrieving current branch: no branches available');
     }
 
     /**
@@ -94,7 +97,7 @@ class GitRepository implements Repository
             $series = 'v';
         }
 
-        return $this->execute(
+        return $this->outputOf(
                 'git tag -l | grep "' . $series . '" | sort -r | head -' . $amount,
                 'Failure while retrieving last releases'
         );
@@ -108,7 +111,7 @@ class GitRepository implements Repository
      */
     public function createRelease(Version $version): array
     {
-        return $this->execute(
+        return $this->outputOf(
                 'git tag -a ' . $version . ' -m "tag release ' . $version
                 . '" && git push --tags',
                 'Failure while creating release'
@@ -125,7 +128,7 @@ class GitRepository implements Repository
      * @return  string[]
      * @throws  RepositoryError
      */
-    private function execute(string $command, string $errorMessage): array
+    private function outputOf(string $command, string $errorMessage): array
     {
         try {
             $data = [];
