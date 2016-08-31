@@ -19,6 +19,18 @@ use stubbles\streams\memory\MemoryInputStream;
  */
 class NoRepository implements Repository
 {
+    private $path;
+
+    /**
+     * constructor
+     *
+     * @param  string  $path
+     */
+    public function __construct(string $path)
+    {
+        $this->path = $path;
+    }
+
     /**
      * checks whether repository is dirty and therefore can't be released
      *
@@ -37,7 +49,7 @@ class NoRepository implements Repository
     public function status(): InputStream
     {
         return new MemoryInputStream(
-                'Current directory is not a known type of repository'
+                'Directory ' . $this->path . ' is not a known type of repository'
         );
     }
 
@@ -74,7 +86,7 @@ class NoRepository implements Repository
     public function createRelease(Version $version, Key $key = null): array
     {
         throw new RepositoryError(
-                'Can\'t create release here, is not a known repository'
+                'Can\'t create release from ' . $this->path . ', is not a known repository'
         );
     }
 }

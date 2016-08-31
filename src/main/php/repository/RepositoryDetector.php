@@ -45,6 +45,6 @@ class RepositoryDetector
             return new GitRepository($path, $this->executor);
         }
 
-        return new NoRepository();
+        return new NoRepository($path);
     }
 }

@@ -36,7 +36,7 @@ class NoRepositoryTestCase extends \PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
-        $this->noRepository = new NoRepository();
+        $this->noRepository = new NoRepository(__DIR__);
     }
 
     /**
@@ -54,7 +54,7 @@ class NoRepositoryTestCase extends \PHPUnit_Framework_TestCase
     {
         assert(
                 $this->noRepository->status()->readLine(),
-                equals('Current directory is not a known type of repository')
+                equals('Directory ' . __DIR__ . ' is not a known type of repository')
         );
     }
 
