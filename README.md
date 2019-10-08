@@ -68,17 +68,6 @@ a little help ReleaseIt will display the last five releases.
 
 ## Installation
 
-### As a phar (recommended)
-
-Download a ready-to-use version:
-
-```bash
-$ wget http://releaseit.bovigo.org/releaseIt.phar
-$ chmod +x releaseIt.phar
-```
-
-It is recommended to move the file into a directory which is in `$PATH`.
-
 ### Manual Installation from Source
 
 This project requires PHP 5.3+ and Composer:
